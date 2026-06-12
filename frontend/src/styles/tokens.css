@@ -1,0 +1,199 @@
+/* ═══════════════════════════════════════════════════════════════════
+   DairyForm Design Tokens  —  Premium Dairy UI
+   ═══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Palette ─────────────────────────────────────────────────────── */
+  --color-sky-50:   #F0F9FF;
+  --color-sky-100:  #E0F2FE;
+  --color-sky-200:  #BAE6FD;
+  --color-sky-300:  #7DD3FC;
+  --color-sky-400:  #38BDF8;
+  --color-sky-500:  #0EA5E9;
+  --color-sky-600:  #0284C7;
+  --color-sky-700:  #0369A1;
+
+  --color-cream-50:  #FFFEF9;
+  --color-cream-100: #FFFBF0;
+  --color-cream-200: #FEF6E4;
+  --color-cream-300: #FDE8C8;
+
+  --color-gold-400: #FBBF24;
+  --color-gold-500: #F59E0B;
+
+  /* ── Semantic tokens ─────────────────────────────────────────────── */
+  --brand-primary:   var(--color-sky-500);
+  --brand-secondary: var(--color-sky-200);
+  --brand-accent:    var(--color-cream-200);
+  --surface-page:    #FAFCFF;
+  --surface-card:    rgba(255, 255, 255, 0.95);
+  --surface-glass:   rgba(255, 255, 255, 0.72);
+  --text-primary:    #0F172A;
+  --text-secondary:  #475569;
+  --text-muted:      #94A3B8;
+  --border-soft:     rgba(186, 230, 253, 0.5);
+  --border-glass:    rgba(255, 255, 255, 0.6);
+
+  /* ── Glass morphism ──────────────────────────────────────────────── */
+  --glass-bg:         rgba(255, 255, 255, 0.72);
+  --glass-bg-heavy:   rgba(255, 255, 255, 0.88);
+  --glass-border:     rgba(255, 255, 255, 0.60);
+  --glass-border-sky: rgba(186, 230, 253, 0.50);
+  --glass-shadow:     0 8px 32px rgba(14, 165, 233, 0.10),
+                      0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  --glass-shadow-lg:  0 16px 48px rgba(14, 165, 233, 0.14),
+                      0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  --glass-blur:       blur(20px);
+  --glass-blur-lg:    blur(32px);
+
+  /* ── Shadows ─────────────────────────────────────────────────────── */
+  --shadow-soft-sm:  0 1px 8px rgba(14, 165, 233, 0.06);
+  --shadow-soft:     0 4px 20px rgba(14, 165, 233, 0.10);
+  --shadow-soft-lg:  0 8px 40px rgba(14, 165, 233, 0.14);
+  --shadow-soft-xl:  0 20px 60px rgba(14, 165, 233, 0.18);
+  --shadow-card:     0 1px 3px rgba(0,0,0,0.04),
+                     0 8px 32px rgba(14, 165, 233, 0.08);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06),
+                       0 20px 50px rgba(14, 165, 233, 0.18);
+
+  /* ── Border radius ───────────────────────────────────────────────── */
+  --radius-sm:   0.5rem;
+  --radius-md:   0.75rem;
+  --radius-lg:   1rem;
+  --radius-xl:   1.5rem;
+  --radius-2xl:  2rem;
+  --radius-pill: 9999px;
+
+  /* ── Typography ──────────────────────────────────────────────────── */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body:    "Inter", ui-sans-serif, system-ui;
+  --font-accent:  "DM Sans", Inter, sans-serif;
+
+  /* ── Spacing scale (base 4px) ────────────────────────────────────── */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* ── Motion ──────────────────────────────────────────────────────── */
+  --ease-spring:    cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-bounce:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:    cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:  150ms;
+  --duration-base:  250ms;
+  --duration-slow:  400ms;
+  --duration-slower: 600ms;
+
+  /* ── Z-index scale ───────────────────────────────────────────────── */
+  --z-below:    -1;
+  --z-base:      0;
+  --z-raised:   10;
+  --z-overlay:  20;
+  --z-sticky:   30;
+  --z-drawer:   40;
+  --z-modal:    50;
+  --z-toast:    60;
+  --z-tooltip:  70;
+}
+
+/* ── Global base styles ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--surface-page);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Glass utility classes ──────────────────────────────────────────── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-heavy {
+  background: var(--glass-bg-heavy);
+  backdrop-filter: var(--glass-blur-lg);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  border: 1px solid var(--glass-border-sky);
+  box-shadow: var(--glass-shadow-lg);
+}
+
+.glass-sky {
+  background: rgba(240, 249, 255, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(186, 230, 253, 0.5);
+}
+
+/* ── Liquid blob shapes ─────────────────────────────────────────────── */
+.blob-shape {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  animation: liquid 6s ease-in-out infinite;
+}
+
+/* ── Shimmer skeleton ───────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-sky-50) 0%,
+    rgba(255,255,255,0.8) 50%,
+    var(--color-sky-50) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+  border-radius: var(--radius-md);
+}
+
+/* ── Scrollbar styling ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-sky-50); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-sky-200);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-sky-300); }
+
+/* ── Text gradient ──────────────────────────────────────────────────── */
+.text-gradient-sky {
+  background: linear-gradient(135deg, #0284C7, #38BDF8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-cream {
+  background: linear-gradient(135deg, #D97706, #FBBF24);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── 3D card tilt ────────────────────────────────────────────────────── */
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+/* ── Wave divider ────────────────────────────────────────────────────── */
+.wave-divider svg { display: block; }
+
+/* ── Focus ring ─────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-sky-400);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}

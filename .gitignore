@@ -1,0 +1,36 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+*.env.local
+*.env.*.local
+
+# Dependencies
+node_modules/
+vendor/
+docker/
+docs/
+
+# Build artifacts
+/frontend/dist/
+/frontend/build/
+/frontend/node_modules/
+
+# Laravel
+/backend/storage/logs/*.log
+/backend/storage/framework/cache/
+/backend/storage/framework/sessions/
+/backend/storage/framework/views/
+/backend/bootstrap/cache/*.php
+/backend/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker volumes
+docker/data/
