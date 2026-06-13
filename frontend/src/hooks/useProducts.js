@@ -4,6 +4,17 @@ import { useDispatch } from 'react-redux';
 import { setNotification } from '@/store/redux/uiSlice';
 import { addItem } from '@/store/redux/cartSlice';
 
+const normalize = (p) => ({
+  ...p,
+  name:             p.product_name       ?? p.name             ?? '',
+  category:         p.category?.name     ?? p.category         ?? '',
+  image:            p.images?.find((i) => i.is_primary)?.image_path
+                    ?? p.images?.[0]?.image_path
+                    ?? p.image
+                    ?? null,
+  shortDescription: p.short_description  ?? p.shortDescription ?? null,
+});
+
 const KEYS = {
   all:         ['products'],
   list:        (p) => ['products', 'list', p],
@@ -52,7 +63,8 @@ export function useProducts(filters = {}) {
     queryFn:  async () => {
       try {
         const res = await productApi.list(filters);
-        return res.data;
+        const env = res.data;
+        return { data: (env.data ?? []).map(normalize), meta: env.meta };
       } catch {
         return mockPage(MOCK_PRODUCTS, filters.page, filters.per_page, filters);
       }
@@ -86,7 +98,7 @@ export function useProduct(id) {
     queryFn:  async () => {
       try {
         const res = await productApi.get(id);
-        return res.data;
+        return normalize(res.data?.data ?? res.data);
       } catch {
         return MOCK_PRODUCTS.find((p) => p.id === +id) ?? null;
       }

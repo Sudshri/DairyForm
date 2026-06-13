@@ -9,7 +9,7 @@ export default function AdminGuard({ children }) {
   if (!isInitialized) return <PageLoader />;
 
   if (!token) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    return <Navigate to="/admin/login" state={{ from: location.pathname }} replace />;
   }
 
   if (user?.role !== 'admin') {

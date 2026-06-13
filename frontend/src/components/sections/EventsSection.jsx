@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Users, Building2, PartyPopper, Star } from 'lucide-react';
+import section2 from '../../assets/section2.png';
 
 const EVENTS = [
   { icon: PartyPopper, title:'Marriage & Weddings',  desc:'Custom dairy packages for all wedding functions — from haldi to reception.', bg:'#FFFBEB', color:'#D97706' },
@@ -53,20 +54,8 @@ export default function EventsSection({ onBulkOrder }) {
           {/* Right visual */}
           <motion.div className="relative" initial={{ opacity:0, x:40 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6, delay:0.1 }}>
             <div className="aspect-square rounded-3xl overflow-hidden relative"
-              style={{ background:'linear-gradient(135deg,#E0F8FF,#EEF7D8)', border:'1.5px solid var(--d-border-lt)', boxShadow:'var(--d-shadow-lg)' }}>
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6">
-                <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center">
-                  {['🎊','🥛','🎂','🧈','💒','🍯'].map((e,i) => (
-                    <motion.span key={i} className="text-3xl sm:text-4xl"
-                      animate={{ scale:[1,1.12,1] }} transition={{ duration:2, repeat:Infinity, delay:i*0.3 }}>
-                      {e}
-                    </motion.span>
-                  ))}
-                </div>
-                <p className="font-display text-base sm:text-xl font-bold mt-4 text-center" style={{ color:'var(--d-accent)' }}>
-                  Fresh Dairy for Every Celebration
-                </p>
-              </div>
+              style={{ border:'1.5px solid var(--d-border-lt)', boxShadow:'var(--d-shadow-lg)' }}>
+              <img src={section2} alt="Fresh Dairy for Every Celebration" className="w-full h-full object-cover" />
             </div>
 
             <motion.div className="absolute -bottom-3 right-4 sm:-bottom-4 px-4 py-3 sm:py-4 rounded-2xl"

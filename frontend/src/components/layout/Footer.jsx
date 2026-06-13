@@ -58,11 +58,23 @@ export default function Footer() {
               Trusted by thousands of families and businesses.
             </p>
             <div className="space-y-2 mb-5">
-              {[{Icon:Phone,text:'+91 12345 67890'},{Icon:Mail,text:'hello@dairyform.com'},{Icon:MapPin,text:'Hadapsar, Pune – 411013'}].map(({Icon,text})=>(
+              {[
+                {Icon:Phone,  text:'+91 12345 67890'},
+                {Icon:Mail,   text:'contact@everfresh.org.in'},
+                {Icon:MapPin, text:'SHYAM DAIRY UDYOG, Prop – Harveer'},
+              ].map(({Icon,text})=>(
                 <div key={text} className="flex items-center gap-2.5 text-sm" style={{ color:'var(--d-text-2)' }}>
                   <Icon size={13} style={{ color:'var(--d-accent)', flexShrink:0 }} />{text}
                 </div>
               ))}
+              <div className="flex items-start gap-2.5 text-sm" style={{ color:'var(--d-text-2)' }}>
+                <MapPin size={13} className="mt-0.5 shrink-0" style={{ color:'transparent' }} />
+                <span className="text-xs leading-relaxed" style={{ color:'var(--d-text-2)' }}>
+                  Plot No. D-109, Shyam Industries,<br />
+                  NH-52, RIICO Industrial Area, Palsana,<br />
+                  Sikar, Rajasthan – 332402
+                </span>
+              </div>
             </div>
             <div className="flex gap-2">
               {SOCIALS.map(({ icon: Icon, href, label }) => (
@@ -128,8 +140,25 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Legal & Compliance strip */}
+        <div className="mt-10 sm:mt-12 pt-6 flex flex-wrap gap-x-6 gap-y-2 items-center"
+          style={{ borderTop:'1px solid var(--d-border-lt)' }}>
+          <p className="text-xs font-bold uppercase tracking-widest w-full sm:w-auto" style={{ color:'var(--d-muted)' }}>Legal &amp; Compliance</p>
+          {[
+            { label:'UDYAM Registered MSME', value:'UDYAM-RJ-30-0003396' },
+            { label:'GST Registered',        value:'08AIYPH7023E1Z2' },
+            { label:'FSSAI Licensed',        value:'12225039000413' },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex items-center gap-1.5 text-xs" style={{ color:'var(--d-muted)' }}>
+              <span style={{ color:'var(--d-accent)' }}>✓</span>
+              <span>{label}:</span>
+              <span className="font-mono">{value}</span>
+            </div>
+          ))}
+        </div>
+
         {/* Bottom bar */}
-        <div className="mt-12 sm:mt-14 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
+        <div className="mt-4 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3"
           style={{ borderTop:'1px solid var(--d-border-lt)' }}>
           <p className="text-xs" style={{ color:'var(--d-muted)' }}>© {new Date().getFullYear()} DairyForm. All rights reserved.</p>
           <p className="text-xs" style={{ color:'var(--d-muted)' }}>Made with ❤️ for fresh dairy lovers</p>

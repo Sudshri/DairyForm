@@ -1,5 +1,12 @@
 import { motion } from 'framer-motion';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, ShieldCheck, Building2, Receipt } from 'lucide-react';
+import section1 from '../../assets/section1.png';
+
+const REGISTRATIONS = [
+  { icon: Building2,   label:'UDYAM Registration', value:'UDYAM-RJ-30-0003396', bg:'#FFFBEB', color:'#D97706' },
+  { icon: Receipt,     label:'GST Registration',   value:'08AIYPH7023E1Z2',     bg:'#EEF7D8', color:'#8BC63E' },
+  { icon: ShieldCheck, label:'FSSAI License',       value:'12225039000413',       bg:'#E0F8FF', color:'#17C0F2' },
+];
 
 const PILLARS = [
   { label:'Vision',            text:'To be India\'s most trusted dairy brand delivering pure, natural products to millions of families.' },
@@ -49,12 +56,32 @@ export default function AboutSection() {
               ))}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-8">
               {HIGHLIGHTS.map(h => (
                 <div key={h} className="flex items-center gap-2 text-sm" style={{ color:'var(--d-text-2)' }}>
                   <CheckCircle size={14} style={{ color:'var(--d-accent)', flexShrink:0 }} />{h}
                 </div>
               ))}
+            </div>
+
+            <div className="pt-6" style={{ borderTop:'1px solid var(--d-border-lt)' }}>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color:'var(--d-muted)' }}>
+                Certifications &amp; Registrations
+              </p>
+              <div className="space-y-2">
+                {REGISTRATIONS.map(({ icon: Icon, label, value, bg, color }) => (
+                  <div key={label} className="flex items-center gap-3 px-4 py-3 rounded-2xl"
+                    style={{ background:'var(--d-input)', border:'1px solid var(--d-border-lt)' }}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: bg }}>
+                      <Icon size={14} style={{ color }} />
+                    </div>
+                    <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
+                      <p className="text-xs font-semibold" style={{ color:'var(--d-text)' }}>{label}</p>
+                      <p className="text-2xs font-mono" style={{ color:'var(--d-muted)' }}>{value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </motion.div>
 
@@ -64,19 +91,12 @@ export default function AboutSection() {
             transition={{ duration:0.6, delay:0.1 }}
           >
             <div className="aspect-square rounded-3xl overflow-hidden relative"
-              style={{ background:'linear-gradient(135deg,#E0F8FF,#EEF7D8)', border:'1.5px solid var(--d-border-lt)', boxShadow:'var(--d-shadow-lg)' }}>
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
-                <div className="text-7xl sm:text-8xl animate-float">🐄</div>
-                <div className="flex gap-6 sm:gap-8 text-4xl sm:text-5xl">
-                  <span className="animate-float" style={{ animationDelay:'0.5s' }}>🥛</span>
-                  <span className="animate-float" style={{ animationDelay:'1s' }}>🌿</span>
-                  <span className="animate-float" style={{ animationDelay:'1.5s' }}>🍯</span>
-                </div>
-                <p className="font-display text-base sm:text-lg font-semibold text-center"
-                  style={{ color:'var(--d-accent)' }}>
-                  Farm to Your Doorstep
-                </p>
-              </div>
+              style={{ border:'1.5px solid var(--d-border-lt)', boxShadow:'var(--d-shadow-lg)' }}>
+              <img
+                src={section1}
+                alt="Farm to Your Doorstep"
+                className="w-full h-full object-cover"
+              />
             </div>
 
             <motion.div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 px-4 py-3 rounded-2xl"

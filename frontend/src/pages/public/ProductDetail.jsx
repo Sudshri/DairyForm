@@ -1,184 +1,218 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+﻿import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingCart, Heart, Share2, Shield, Truck, RefreshCw, Star, ChevronDown, ChevronUp } from 'lucide-react';
-import QuantitySelector from '@/components/ui/QuantitySelector';
-import StarRating from '@/components/ui/StarRating';
-import Button from '@/components/ui/Button';
+import { Heart, Share2, Shield, Star, ChevronDown, ChevronUp, Phone, Mail, ArrowLeft, Check } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
-import Badge from '@/components/ui/Badge';
 import { FloatingBlob } from '@/components/ui/MilkWave';
-import { useCartStore } from '@/store/cartStore';
-import { formatCurrency } from '@/utils/formatters';
+import { useProduct } from '@/hooks/useProducts';
+import BulkOrderModal from '@/components/modals/BulkOrderModal';
 
-const MOCK_PRODUCT = {
-  id: 1,
-  name: 'Farm Fresh Full Cream Milk A2',
-  category: 'Milk',
-  price: 65,
-  originalPrice: 75,
-  unit: 'litre',
-  rating: 4.8,
-  reviews: 124,
-  stock: 48,
-  isNew: true,
-  description: `Our premium A2 full cream milk comes straight from our network of certified organic farms.
-    Each cow is pasture-fed and cared for with the highest ethical standards.
-    Rich in calcium, protein and natural vitamins — the way milk was meant to be.`,
-  details: [
-    ['Fat Content', '6.0%'],
-    ['SNF', '9.0%'],
-    ['Protein', '3.5%'],
-    ['Source', 'Gir Cow (A2 Beta-Casein)'],
-    ['Pasteurization', 'HTST Pasteurized'],
-    ['Shelf Life', '24 hours (refrigerated)'],
-  ],
-  images: [null, null, null],
-  variants: [
-    { label: '500 ml', price: 35 },
-    { label: '1 Litre', price: 65, default: true },
-    { label: '2 Litres', price: 125 },
-  ],
+const BENEFITS = {
+  Milk:   ['Rich in Calcium & Vitamins', 'No Preservatives', 'Pasteurized & Safe', 'Farm Fresh Daily'],
+  Ghee:   ['A2 Beta-Casein Protein', 'Rich in Healthy Fats', 'Traditional Bilona Method', 'Improves Digestion'],
+  Paneer: ['High Protein Content', 'Soft & Fresh Texture', 'No Artificial Colors', 'Full Cream Milk'],
+  Butter: ['Pure Cream Butter', 'No Trans Fats', 'Rich Natural Taste', 'Ideal for Cooking'],
+  default:['100% Natural', 'No Preservatives', 'Farm to Table', 'Quality Tested'],
 };
 
-const REVIEWS = [
-  { name:'Priya S.', rating:5, date:'2 days ago',  comment:'Absolutely the freshest milk I have had!' },
-  { name:'Arjun M.', rating:5, date:'1 week ago',  comment:'A2 quality is noticeable. Kids love it!' },
-  { name:'Meena K.', rating:4, date:'2 weeks ago', comment:'Great product. Delivery could be a bit earlier.' },
-];
-
 const FAQ = [
-  { q: 'How fresh is the milk?',           a: 'Milk is sourced the same morning and delivered within 4 hours of milking.' },
-  { q: 'What is A2 milk?',                  a: 'A2 milk contains only the A2 beta-casein protein, naturally from Gir cows. Easier to digest than regular milk.' },
-  { q: 'How should I store it?',            a: 'Refrigerate immediately upon delivery. Best consumed within 24 hours.' },
+  { q: 'How fresh are the products?',  a: 'Products are sourced fresh and dispatched within 24 hours of processing.' },
+  { q: 'What certifications do you hold?', a: 'We are FSSAI certified (12225039000413) and GST registered (08AIYPH7023E1Z2).' },
+  { q: 'How do I place a bulk order?', a: 'Contact us at contact@everfresh.org.in or call us directly for wholesale pricing and bulk delivery options.' },
 ];
 
 export default function ProductDetail() {
-  const { id } = useParams();
-  const [qty,       setQty]      = useState(1);
-  const [liked,     setLiked]    = useState(false);
-  const [selImg,    setSelImg]   = useState(0);
-  const [selVar,    setSelVar]   = useState(MOCK_PRODUCT.variants.findIndex((v) => v.default));
-  const [openFaq,   setOpenFaq]  = useState(null);
-  const [tab,       setTab]      = useState('description');
-  const addItem = useCartStore((s) => s.addItem);
+  const { id }       = useParams();
+  const navigate     = useNavigate();
+  const [liked,    setLiked]    = useState(false);
+  const [selImg,   setSelImg]   = useState(0);
+  const [selVar,   setSelVar]   = useState(0);
+  const [openFaq,  setOpenFaq]  = useState(null);
+  const [tab,      setTab]      = useState('description');
 
-  const variant = MOCK_PRODUCT.variants[selVar];
-  const price   = variant?.price ?? MOCK_PRODUCT.price;
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const { data: product, isLoading, isError } = useProduct(id);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-milk-soft pt-28 pb-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div className="skeleton aspect-square rounded-4xl" />
+            <div className="space-y-4">
+              <div className="skeleton h-6 w-32 rounded-xl" />
+              <div className="skeleton h-10 w-3/4 rounded-xl" />
+              <div className="skeleton h-4 w-1/2 rounded-xl" />
+              <div className="skeleton h-20 rounded-2xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !product) {
+    return (
+      <div className="min-h-screen bg-milk-soft pt-28 pb-20 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-5xl mb-4">??</p>
+          <p className="font-display text-2xl text-slate-700 mb-2">Product not found</p>
+          <button onClick={() => navigate('/products')} className="mt-4 text-blue-500 hover:underline text-sm">
+            Back to all products
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const cat      = product.category ?? '';
+  const benefits = BENEFITS[cat] ?? BENEFITS.default;
+  const variants = product.variants ?? [];
+  const variant  = variants[selVar] ?? null;
+  const selling  = variant?.selling_price ?? 0;
+  const mrp      = variant?.mrp_price ?? 0;
+  const discount = mrp > selling && selling > 0 ? Math.round((1 - selling / mrp) * 100) : 0;
+
+  const images = product.images?.length
+    ? product.images.map((img) => img.image_path ?? img.full_url)
+    : [product.image];
 
   return (
     <div className="min-h-screen bg-milk-soft pt-28 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
+        {/* Back */}
+        <button
+          onClick={() => navigate('/products')}
+          className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-8 transition-colors"
+        >
+          <ArrowLeft size={16} /> Back to Products
+        </button>
+
         <div className="grid lg:grid-cols-2 gap-12 mb-20">
-          {/* ── Image gallery ─────────────────────────── */}
+          {/* Image gallery */}
           <div className="space-y-4">
-            <div className="relative aspect-square rounded-4xl overflow-hidden bg-gradient-to-br from-blue-50 to-cream-100 flex items-center justify-center shadow-soft-lg">
+            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-50 to-sky-50"
+              style={{ height: '420px' }}>
               <FloatingBlob color="#BAE6FD" size={200} opacity={0.3} className="top-0 right-0" />
-              <motion.span
-                key={selImg}
-                className="text-9xl relative z-10"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              >
-                🥛
-              </motion.span>
-              {MOCK_PRODUCT.isNew && (
-                <div className="absolute top-4 left-4"><Badge variant="sky">New</Badge></div>
-              )}
-            </div>
-            <div className="flex gap-3">
-              {MOCK_PRODUCT.images.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setSelImg(i)}
-                  className={`flex-1 aspect-square rounded-2xl bg-gradient-to-br from-blue-50 to-cream-100
-                    flex items-center justify-center text-3xl transition-all ${
-                    selImg === i ? 'ring-2 ring-blue-400 shadow-soft' : 'opacity-60 hover:opacity-90'
-                  }`}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selImg}
+                  className="absolute inset-0 flex items-center justify-center p-6"
+                  initial={{ opacity: 0, scale: 0.92 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
                 >
-                  🥛
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Product info ───────────────────────────── */}
-          <div className="flex flex-col gap-5">
-            <div>
-              <p className="text-sm text-blue-500 font-semibold uppercase tracking-wider mb-1">
-                {MOCK_PRODUCT.category}
-              </p>
-              <h1 className="font-display text-3xl md:text-4xl text-slate-900 mb-3 leading-tight">
-                {MOCK_PRODUCT.name}
-              </h1>
-              <div className="flex items-center gap-3">
-                <StarRating value={MOCK_PRODUCT.rating} size={16} />
-                <span className="text-sm text-slate-500 font-medium">{MOCK_PRODUCT.rating}</span>
-                <span className="text-sm text-slate-400">({MOCK_PRODUCT.reviews} reviews)</span>
-              </div>
+                  {images[selImg] ? (
+                    <img
+                      src={images[selImg]}
+                      alt={product.name}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-9xl">🥛</span>
+                  )}
+                </motion.div>
+              </AnimatePresence>
             </div>
 
-            {/* Price */}
-            <div className="flex items-end gap-3">
-              <span className="font-display text-4xl font-bold text-slate-900">
-                {formatCurrency(price)}
-              </span>
-              {MOCK_PRODUCT.originalPrice && (
-                <span className="text-slate-400 line-through text-lg mb-1">
-                  {formatCurrency(MOCK_PRODUCT.originalPrice)}
-                </span>
-              )}
-              <span className="text-slate-400 mb-1">/ {MOCK_PRODUCT.unit}</span>
-            </div>
-
-            {/* Variants */}
-            <div>
-              <p className="text-sm font-medium text-slate-700 mb-2">Size</p>
-              <div className="flex gap-2">
-                {MOCK_PRODUCT.variants.map((v, i) => (
+            {images.length > 1 && (
+              <div className="flex gap-3">
+                {images.map((src, i) => (
                   <button
-                    key={v.label}
-                    onClick={() => setSelVar(i)}
-                    className={`px-4 py-2 rounded-2xl text-sm font-medium border transition-all ${
-                      selVar === i
-                        ? 'bg-blue-500 text-white border-blue-500 shadow-soft-md'
-                        : 'bg-white text-slate-600 border-blue-100 hover:border-blue-300'
+                    key={i}
+                    onClick={() => setSelImg(i)}
+                    className={`flex-1 aspect-square rounded-2xl bg-gradient-to-br from-blue-50 to-sky-50
+                      flex items-center justify-center overflow-hidden transition-all ${
+                      selImg === i ? 'ring-2 ring-blue-400 shadow-soft' : 'opacity-60 hover:opacity-90'
                     }`}
                   >
-                    {v.label}
+                    {src ? <img src={src} alt="" className="w-full h-full object-contain p-2" /> : <span className="text-3xl">??</span>}
                   </button>
                 ))}
               </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex flex-col gap-5">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--d-accent)' }}>
+                {cat}
+              </p>
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="font-display text-3xl md:text-4xl text-slate-900 leading-tight">
+                  {product.name}
+                </h1>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    onClick={() => setLiked((l) => !l)}
+                    className="w-10 h-10 rounded-2xl border border-blue-100 bg-white flex items-center justify-center transition-colors"
+                  >
+                    <Heart size={18} style={{ color: liked ? '#EF4444' : '#94A3B8', fill: liked ? '#EF4444' : 'none' }} />
+                  </button>
+                  <button className="w-10 h-10 rounded-2xl border border-blue-100 bg-white flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                    <Share2 size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {product.shortDescription && (
+                <p className="text-slate-500 mt-2 leading-relaxed">{product.shortDescription}</p>
+              )}
             </div>
 
-            {/* Quantity + Add to cart */}
-            <div className="flex items-center gap-4">
-              <QuantitySelector value={qty} min={1} max={MOCK_PRODUCT.stock} onChange={setQty} />
-              <Button
-                size="lg"
-                icon={<ShoppingCart size={18} />}
-                className="flex-1"
-                onClick={() => addItem({ ...MOCK_PRODUCT, price }, qty)}
-              >
-                Add to Cart
-              </Button>
-              <button
-                onClick={() => setLiked(!liked)}
-                className={`w-12 h-12 rounded-2xl glass flex items-center justify-center
-                  transition-colors ${liked ? 'text-red-500' : 'text-slate-400 hover:text-red-400'}`}
-              >
-                <Heart size={20} fill={liked ? 'currentColor' : 'none'} />
-              </button>
-            </div>
+            {/* Variants */}
+            {variants.length > 0 && (
+              <div>
+                <p className="text-sm font-semibold text-slate-700 mb-3">Available Sizes</p>
+                <div className="flex flex-wrap gap-2">
+                  {variants.map((v, i) => {
+                    const isSel = i === selVar;
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => setSelVar(i)}
+                        className="px-4 py-2.5 rounded-2xl text-sm font-medium border transition-all"
+                        style={{
+                          background: isSel ? 'var(--d-accent-lt)' : '#fff',
+                          borderColor: isSel ? 'var(--d-accent)' : '#E2EAF0',
+                          color: isSel ? 'var(--d-accent)' : '#475569',
+                        }}
+                      >
+                        {v.variant_name}
+                        <span className="ml-2 font-bold">Rs.{v.selling_price}</span>
+                        {v.mrp_price > v.selling_price && (
+                          <span className="ml-1 line-through text-xs opacity-50">Rs.{v.mrp_price}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
 
-            {/* Guarantees */}
+                {variant && (
+                  <div className="flex items-end gap-3 mt-4">
+                    <span className="font-display text-4xl font-bold text-slate-900">Rs.{selling}</span>
+                    {mrp > selling && (
+                      <span className="text-slate-400 line-through text-xl mb-0.5">Rs.{mrp}</span>
+                    )}
+                    {discount > 0 && (
+                      <span className="text-sm font-bold px-3 py-1 rounded-full bg-red-50 text-red-500 mb-0.5">
+                        {discount}% OFF
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Trust badges */}
             <div className="grid grid-cols-3 gap-3">
               {[
-                { icon: <Truck size={16} />,      text: 'Free delivery above ₹500' },
-                { icon: <Shield size={16} />,     text: '100% pure & tested' },
-                { icon: <RefreshCw size={16} />,  text: 'Freshness guarantee' },
+                { icon: <Shield size={16} />, text: 'FSSAI Certified' },
+                { icon: <Star size={16} />, text: 'Premium Quality' },
+                { icon: <Check size={16} />, text: 'Farm to Table' },
               ].map(({ icon, text }) => (
                 <GlassCard key={text} variant="white" className="p-3 text-center flex flex-col items-center gap-1.5">
                   <span className="text-blue-500">{icon}</span>
@@ -187,29 +221,43 @@ export default function ProductDetail() {
               ))}
             </div>
 
-            {/* Quick details */}
+            {/* Benefits */}
             <div className="grid grid-cols-2 gap-2">
-              {MOCK_PRODUCT.details.slice(0, 4).map(([k, v]) => (
-                <div key={k} className="bg-blue-50/60 rounded-2xl px-3 py-2">
-                  <p className="text-2xs text-slate-400 uppercase tracking-wide">{k}</p>
-                  <p className="text-sm font-medium text-slate-700">{v}</p>
+              {benefits.map((b) => (
+                <div key={b} className="flex items-center gap-2 text-sm text-slate-600">
+                  <Check size={14} style={{ color: 'var(--d-accent)', flexShrink: 0 }} />
+                  {b}
                 </div>
               ))}
+            </div>
+
+            {/* Enquire CTA */}
+            <div className="space-y-3 mt-2">
+              <button
+                onClick={() => setBulkOpen(true)}
+                className="d-btn-accent w-full py-3.5 text-sm font-semibold flex items-center justify-center gap-2 rounded-2xl"
+              >
+                <Mail size={16} /> Enquire for Bulk Order
+              </button>
+              <a
+                href="tel:+91"
+                className="w-full py-3 text-sm font-semibold flex items-center justify-center gap-2 rounded-2xl border border-blue-200 text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors"
+              >
+                <Phone size={16} /> Call Us
+              </a>
             </div>
           </div>
         </div>
 
-        {/* ── Tabs ─────────────────────────────────────── */}
+        {/* Tabs */}
         <div className="mb-8 border-b border-blue-100">
           <div className="flex gap-0">
-            {['description', 'reviews', 'faq'].map((t) => (
+            {['description', 'faq'].map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
                 className={`px-6 py-3 text-sm font-medium capitalize border-b-2 transition-colors ${
-                  tab === t
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
+                  tab === t ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700'
                 }`}
               >
                 {t}
@@ -220,41 +268,27 @@ export default function ProductDetail() {
 
         <AnimatePresence mode="wait">
           {tab === 'description' && (
-            <motion.div key="desc" initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}>
+            <motion.div key="desc" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <div className="grid md:grid-cols-2 gap-8">
-                <p className="text-slate-600 leading-relaxed">{MOCK_PRODUCT.description}</p>
-                <div className="space-y-2">
-                  {MOCK_PRODUCT.details.map(([k, v]) => (
-                    <div key={k} className="flex justify-between py-2 border-b border-blue-50 text-sm">
-                      <span className="text-slate-400">{k}</span>
-                      <span className="font-medium text-slate-700">{v}</span>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-slate-600 leading-relaxed">
+                  {product.description || product.shortDescription || 'Premium quality dairy product sourced from trusted farms.'}
+                </p>
+                {product.details && (
+                  <div className="space-y-2">
+                    {Object.entries(product.details ?? {}).map(([k, v]) => (
+                      <div key={k} className="flex justify-between py-2 border-b border-blue-50 text-sm">
+                        <span className="text-slate-400">{k}</span>
+                        <span className="font-medium text-slate-700">{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
 
-          {tab === 'reviews' && (
-            <motion.div key="rev" initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}
-              className="space-y-4">
-              {REVIEWS.map((r, i) => (
-                <GlassCard key={i} variant="white" className="p-5">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-semibold text-slate-800 text-sm">{r.name}</p>
-                      <p className="text-xs text-slate-400">{r.date}</p>
-                    </div>
-                    <StarRating value={r.rating} size={13} />
-                  </div>
-                  <p className="text-sm text-slate-600">{r.comment}</p>
-                </GlassCard>
-              ))}
-            </motion.div>
-          )}
-
           {tab === 'faq' && (
-            <motion.div key="faq" initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}
+            <motion.div key="faq" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="space-y-3 max-w-2xl">
               {FAQ.map(({ q, a }, i) => (
                 <GlassCard key={i} variant="white" className="overflow-hidden">
@@ -263,16 +297,13 @@ export default function ProductDetail() {
                     className="w-full flex items-center justify-between p-5 text-left"
                   >
                     <span className="font-medium text-slate-800 text-sm">{q}</span>
-                    {openFaq === i ? <ChevronUp size={16} className="text-blue-500 shrink-0" /> : <ChevronDown size={16} className="text-slate-400 shrink-0" />}
+                    {openFaq === i
+                      ? <ChevronUp size={16} className="text-blue-500 shrink-0" />
+                      : <ChevronDown size={16} className="text-slate-400 shrink-0" />}
                   </button>
                   <AnimatePresence>
                     {openFaq === i && (
-                      <motion.div
-                        initial={{ height:0 }}
-                        animate={{ height:'auto' }}
-                        exit={{ height:0 }}
-                        className="overflow-hidden"
-                      >
+                      <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
                         <p className="px-5 pb-5 text-sm text-slate-500 leading-relaxed">{a}</p>
                       </motion.div>
                     )}
@@ -282,8 +313,9 @@ export default function ProductDetail() {
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
+
+      <BulkOrderModal open={bulkOpen} onClose={() => setBulkOpen(false)} />
     </div>
   );
 }

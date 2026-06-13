@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { Phone, Mail, MapPin, Send, CheckCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, CheckCircle, Building2, Receipt, ShieldCheck } from 'lucide-react';
 import { apiPost } from '@/services/apiClient';
 
 const INFO = [
-  { icon: Phone,  label:'Call Us',  value:'+91 12345 67890',        href:'tel:+911234567890', bg:'#E0F8FF', color:'#17C0F2' },
-  { icon: Mail,   label:'Email Us', value:'hello@dairyform.com',    href:'mailto:hello@dairyform.com', bg:'#EEF7D8', color:'#8BC63E' },
-  { icon: MapPin, label:'Visit Us', value:'Hadapsar, Pune – 411013',href:'#', bg:'#FFFBEB', color:'#D97706' },
+  { icon: Phone,  label:'Call Us',  value:'+91 12345 67890',             href:'tel:+911234567890', bg:'#E0F8FF', color:'#17C0F2' },
+  { icon: Mail,   label:'Email Us', value:'contact@everfresh.org.in',    href:'mailto:contact@everfresh.org.in', bg:'#EEF7D8', color:'#8BC63E' },
+  { icon: MapPin, label:'Visit Us', value:'Palsana, Sikar, Rajasthan',   href:'#', bg:'#FFFBEB', color:'#D97706' },
 ];
 
 export default function ContactSection() {
@@ -55,6 +55,7 @@ export default function ContactSection() {
               </motion.a>
             ))}
 
+           
             {/* Map placeholder */}
             <motion.div className="rounded-2xl overflow-hidden h-40 sm:h-44 flex items-center justify-center relative bg-white"
               style={{ border:'1.5px solid var(--d-border-lt)', boxShadow:'var(--d-shadow-sm)' }}
@@ -62,8 +63,8 @@ export default function ContactSection() {
               <div className="absolute inset-0" style={{ background:'linear-gradient(135deg,#E0F8FF,#EEF7D8)' }} />
               <div className="text-center relative z-10">
                 <MapPin size={30} className="mx-auto mb-2" style={{ color:'var(--d-accent)' }} />
-                <p className="font-semibold text-sm" style={{ color:'var(--d-text)' }}>DairyForm HQ</p>
-                <p className="text-xs mt-0.5" style={{ color:'var(--d-muted)' }}>Hadapsar, Pune, Maharashtra</p>
+                <p className="font-semibold text-sm" style={{ color:'var(--d-text)' }}>SHYAM DAIRY UDYOG</p>
+                <p className="text-xs mt-0.5" style={{ color:'var(--d-muted)' }}>Palsana, Sikar, Rajasthan</p>
               </div>
             </motion.div>
           </div>

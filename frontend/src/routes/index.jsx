@@ -20,6 +20,7 @@ const Checkout       = lazy(() => import('@/pages/public/Checkout'));
 const Auth           = lazy(() => import('@/pages/public/Auth'));
 const Testimonials   = lazy(() => import('@/pages/public/Testimonials'));
 const Contact        = lazy(() => import('@/pages/public/Contact'));
+const About          = lazy(() => import('@/pages/public/About'));
 
 // User pages (requires auth)
 const UserDashboard  = lazy(() => import('@/pages/user/UserDashboard'));
@@ -62,6 +63,7 @@ export default function AppRoutes() {
             <Route path="/cart"              element={<Cart />} />
             <Route path="/testimonials"      element={<Testimonials />} />
             <Route path="/contact"           element={<Contact />} />
+            <Route path="/about"             element={<About />} />
             {/* Protected – inside public layout (Navbar+Footer) */}
             <Route path="/dashboard"  element={<PrivateRoute><UserDashboard /></PrivateRoute>} />
             <Route path="/profile"    element={<PrivateRoute><Profile /></PrivateRoute>} />

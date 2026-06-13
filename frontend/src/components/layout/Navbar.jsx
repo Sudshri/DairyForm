@@ -8,11 +8,9 @@ import BulkOrderModal from '@/components/modals/BulkOrderModal';
 import PartnerModal   from '@/components/modals/PartnerModal';
 
 const NAV_LINKS = [
-  { to: '/',           label: 'Home',       end: true },
-  { to: '/products',   label: 'Products' },
-  { to: '/categories', label: 'Categories' },
-  { to: '/about',      label: 'About Us' },
-  { to: '/contact',    label: 'Contact Us' },
+  { to: '/',        label: 'Home',       end: true },
+  { to: '/about',   label: 'About Us' },
+  { to: '/contact', label: 'Contact Us' },
 ];
 
 export default function Navbar() {

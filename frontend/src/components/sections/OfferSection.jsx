@@ -77,8 +77,9 @@ function OfferCard({ offer, index }) {
 export default function OfferSection({ onBulkOrder }) {
   const { data, isLoading } = useQuery({
     queryKey: ['public-offers'],
-    queryFn:  () => apiGet(API.ADMIN.OFFERS.LIST, { is_active:true, is_public:true })
-                    .then(r => r.data?.data ?? MOCK_OFFERS),
+    queryFn:  () => apiGet(API.OFFERS.LIST)
+                    .then(r => r.data?.data ?? MOCK_OFFERS)
+                    .catch(() => MOCK_OFFERS),
     staleTime: 300_000,
   });
 

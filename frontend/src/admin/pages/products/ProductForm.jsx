@@ -57,7 +57,7 @@ export default function ProductForm() {
 
   const { data: product } = useQuery({
     queryKey: ['admin', 'products', id],
-    queryFn: () => productService.show(id).then((r) => r.data),
+    queryFn: () => productService.show(id).then((r) => r.data?.data),
     enabled: isEdit,
   });
 
@@ -82,7 +82,7 @@ export default function ProductForm() {
       ? productService.update(id, data)
       : productService.create(data),
     onSuccess: async (res) => {
-      const pid = res.data?.id ?? id;
+      const pid = res.data?.data?.id ?? id;
       // Upload images if any new ones
       if (images.some((i) => i.file)) {
         setUploading(true);

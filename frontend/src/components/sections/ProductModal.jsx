@@ -57,18 +57,21 @@ export default function ProductModal({ product, open, onClose, onBulkOrder }) {
 
             <div className="flex flex-col md:flex-row overflow-y-auto" style={{ maxHeight:'90vh' }}>
               {/* Left image */}
-              <div className="md:w-2/5 shrink-0 flex items-center justify-center p-8 min-h-[200px] md:min-h-[350px]"
+              <div className="md:w-2/5 shrink-0 relative min-h-[240px] md:min-h-[420px]"
                 style={{ background:'linear-gradient(135deg,#E0F8FF,#EEF7D8)' }}>
-                <div className="relative">
-                  <div className="absolute inset-0 rounded-full blur-3xl opacity-30"
-                    style={{ background:'var(--d-accent-lt)' }} />
-                  {product.image
-                    ? <img src={product.image} alt={product.product_name} className="relative z-10 w-40 h-40 object-contain" />
-                    : <span className="relative z-10 text-8xl" style={{ filter:'drop-shadow(0 4px 20px rgba(23,192,242,0.30))' }}>
-                        {EMOJI[cat] ?? '🥛'}
-                      </span>
-                  }
-                </div>
+                {product.image ? (
+                  <img
+                    src={product.image}
+                    alt={product.product_name}
+                    className="absolute inset-0 w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-9xl" style={{ filter:'drop-shadow(0 4px 20px rgba(23,192,242,0.30))' }}>
+                      {EMOJI[cat] ?? '🥛'}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Right details */}

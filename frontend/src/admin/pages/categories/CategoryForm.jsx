@@ -32,7 +32,10 @@ export default function CategoryForm({ category, categories = [], onClose, onSav
   useEffect(() => { if (category) reset(category); }, [category, reset]);
 
   const mut = useMutation({
-    mutationFn: (data) => isEdit ? categoryService.update(category.id, data) : categoryService.create(data),
+    mutationFn: (data) => {
+      const payload = { ...data, parent_id: data.parent_id || null };
+      return isEdit ? categoryService.update(category.id, payload) : categoryService.create(payload);
+    },
     onSuccess: () => {
       dispatch(setNotification({ type: 'success', message: `Category ${isEdit ? 'updated' : 'created'}!` }));
       onSaved?.();
@@ -85,7 +88,7 @@ export default function CategoryForm({ category, categories = [], onClose, onSav
           <div>
             <label className="input-label">Parent Category</label>
             <select className="input-field" {...register('parent_id')}>
-              <option value="">— None (top level) —</option>
+              <option value="0">— None (top level) —</option>
               {categories.filter((c) => !c.parent_id && c.id !== category?.id).map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}

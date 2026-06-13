@@ -4,6 +4,7 @@ import AdminLayout from '@/admin/layout/AdminLayout';
 import AdminGuard  from './AdminGuard';
 
 // Lazy-load every admin page
+const AdminLogin   = lazy(() => import('@/pages/admin/AdminLogin'));
 const Dashboard    = lazy(() => import('@/admin/pages/Dashboard'));
 const ProductList  = lazy(() => import('@/admin/pages/products/ProductList'));
 const ProductForm  = lazy(() => import('@/admin/pages/products/ProductForm'));
@@ -21,6 +22,8 @@ const UserList     = lazy(() => import('@/admin/pages/users/UserList'));
  */
 export default function AdminRoutes() {
   return (
+    <>
+    <Route path="/admin/login" element={<AdminLogin />} />
     <Route
       path="/admin"
       element={
@@ -55,5 +58,6 @@ export default function AdminRoutes() {
       {/* Users */}
       <Route path="users"           element={<UserList />} />
     </Route>
+    </>
   );
 }

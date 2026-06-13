@@ -4,9 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { X, Package, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { apiPost } from '@/services/apiClient';
+import API from '@/constants/api';
 
-const CATEGORIES = ['Milk','Paneer','Ghee','Dahi','Khoya','Butter','Cheese','Other'];
+const FALLBACK_CATEGORIES = ['Milk','Paneer','Ghee','Dahi','Khoya','Butter','Cheese','Other'];
 
 const schema = z.object({
   full_name:    z.string().min(2,'Name is required'),
@@ -19,6 +21,16 @@ const schema = z.object({
 export default function BulkOrderModal({ open, onClose }) {
   const [submitted, setSubmitted] = useState(false);
   const { register, handleSubmit, reset, formState:{ errors, isSubmitting } } = useForm({ resolver: zodResolver(schema) });
+
+  const { data: categoriesRaw = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn:  () => fetch(API.CATEGORIES.LIST).then(r => r.json()).then(r => r.data ?? []),
+    staleTime: 600_000,
+    enabled: open,
+  });
+  const categories = categoriesRaw.length
+    ? categoriesRaw.map(c => c.name)
+    : FALLBACK_CATEGORIES;
 
   const onSubmit = async (data) => {
     await apiPost('/bulk-order-inquiries', data).catch(() => {});
@@ -87,7 +99,7 @@ export default function BulkOrderModal({ open, onClose }) {
                       <Label>Category *</Label>
                       <select className="d-input" {...register('category')}>
                         <option value="">— Select Category —</option>
-                        {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                        {categories.map(c => <option key={c} value={c}>{c}</option>)}
                       </select>
                       {errors.category && <p className="text-xs mt-1 text-red-500">{errors.category.message}</p>}
                     </div>

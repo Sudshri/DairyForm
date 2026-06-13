@@ -1,4 +1,12 @@
 import { motion } from 'framer-motion';
+import { ShieldCheck, Building2, Receipt, Utensils } from 'lucide-react';
+import section3 from '../../assets/section3.png';
+
+const CERTS = [
+  { icon: ShieldCheck, label:'FSSAI Licensed',        value:'12225039000413',    bg:'#E0F8FF', color:'#17C0F2' },
+  { icon: Receipt,     label:'GST Registered',        value:'08AIYPH7023E1Z2',  bg:'#EEF7D8', color:'#8BC63E' },
+  { icon: Building2,   label:'UDYAM / MSME Registered', value:'UDYAM-RJ-30-0003396', bg:'#FFFBEB', color:'#D97706' },
+];
 
 const STORIES = [
   { emoji:'🌾', title:'Traditional Taste',    desc:'Our ghee is made using the ancient bilona method — slow-churning curd from A2 milk.', color:'#D97706' },
@@ -18,37 +26,8 @@ export default function QualitySection() {
           <motion.div className="relative"
             initial={{ opacity:0, x:-40 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }} transition={{ duration:0.6 }}>
             <div className="aspect-square rounded-3xl overflow-hidden relative"
-              style={{ background:'linear-gradient(135deg,#E0F8FF,#EEF7D8)', border:'1.5px solid var(--d-border-lt)', boxShadow:'var(--d-shadow-lg)' }}>
-              <div className="absolute inset-0 flex items-center justify-center">
-                {[200,160,120,80].map((size,i) => (
-                  <div key={size} className="absolute rounded-full border"
-                    style={{
-                      width: size, height: size,
-                      borderColor: `rgba(23,192,242,${0.08+i*0.05})`,
-                      animation: `spin ${12+i*4}s linear infinite${i%2?' reverse':''}`,
-                    }} />
-                ))}
-                <span className="text-6xl sm:text-7xl relative z-10"
-                  style={{ filter:'drop-shadow(0 4px 20px rgba(23,192,242,0.30))' }}>
-                  🐄
-                </span>
-              </div>
-              {['FSSAI Certified','ISO 22000','Zero Additives','A2 Certified'].map((label,i) => (
-                <motion.div key={label}
-                  className="absolute px-2.5 py-1 rounded-full text-2xs font-bold"
-                  style={{
-                    background:'var(--d-accent-lt)',
-                    border:'1px solid rgba(23,192,242,0.22)',
-                    color:'var(--d-accent-dk)',
-                    top:    i<2?(i===0?'10%':'25%'):'auto',
-                    bottom: i>=2?(i===2?'25%':'10%'):'auto',
-                    left:   i%2===0?'5%':'auto',
-                    right:  i%2!==0?'5%':'auto',
-                  }}
-                  animate={{ opacity:[0.7,1,0.7] }} transition={{ duration:2.5, repeat:Infinity, delay:i*0.5 }}>
-                  ✓ {label}
-                </motion.div>
-              ))}
+              style={{ border:'1.5px solid var(--d-border-lt)', boxShadow:'var(--d-shadow-lg)' }}>
+              <img src={section3} alt="Purity & Quality" className="w-full h-full object-cover" />
             </div>
           </motion.div>
 
@@ -77,6 +56,28 @@ export default function QualitySection() {
             </div>
           </motion.div>
         </div>
+
+        {/* Certifications strip */}
+        <motion.div className="mt-12 sm:mt-14"
+          initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }} transition={{ duration:0.5, delay:0.15 }}>
+          <p className="text-xs font-bold uppercase tracking-widest mb-4 text-center" style={{ color:'var(--d-muted)' }}>
+            Certifications &amp; Registrations
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {CERTS.map(({ icon: Icon, label, value, bg, color }) => (
+              <div key={label} className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white"
+                style={{ border:'1.5px solid var(--d-border-lt)', boxShadow:'var(--d-shadow-sm)' }}>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: bg }}>
+                  <Icon size={16} style={{ color }} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold" style={{ color:'var(--d-text)' }}>{label}</p>
+                  <p className="text-2xs font-mono truncate" style={{ color:'var(--d-muted)' }}>{value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );

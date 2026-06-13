@@ -12,11 +12,26 @@ export const MOCK_CATEGORIES = [
   { id:8, slug:'cheese', name:'Cheese',        emoji:'🧀', description:'Cheddar, mozzarella',  count:4,  color:'gold',  bg:'from-gold-300/20 to-cream-200'},
 ];
 
+const normalizeProduct = (p) => ({
+  ...p,
+  name:             p.product_name      ?? p.name             ?? '',
+  category:         p.category?.name    ?? p.category         ?? '',
+  image:            p.images?.find((i) => i.is_primary)?.image_path
+                    ?? p.images?.[0]?.image_path
+                    ?? p.image
+                    ?? null,
+  shortDescription: p.short_description ?? p.shortDescription ?? null,
+});
+
 export function useCategories() {
   return useQuery({
     queryKey: ['categories'],
     queryFn:  async () => {
-      try { return (await categoryApi.list()).data; }
+      try {
+        const res = await categoryApi.list();
+        const items = res.data?.data;
+        return Array.isArray(items) ? items : MOCK_CATEGORIES;
+      }
       catch { return MOCK_CATEGORIES; }
     },
     staleTime: 600_000,
@@ -27,12 +42,15 @@ export function useCategoryProducts(slug, params = {}) {
   return useQuery({
     queryKey: ['categories', slug, 'products', params],
     queryFn:  async () => {
-      try { return (await categoryApi.products(slug, params)).data; }
-      catch {
+      try {
+        const res = await categoryApi.products(slug, params);
+        const env = res.data;
+        return { data: (env.data ?? []).map(normalizeProduct), meta: env.meta };
+      } catch {
         const { MOCK_PRODUCTS } = await import('@/hooks/useProducts');
         const cat = MOCK_CATEGORIES.find((c) => c.slug === slug);
         const filtered = MOCK_PRODUCTS.filter((p) =>
-          cat ? p.category.toLowerCase() === cat.name.replace(' Milk', 'Milk').split(' ')[0].toLowerCase() ||
+          cat ? p.category.toLowerCase() === cat.name.split(' ')[0].toLowerCase() ||
                 p.category.toLowerCase() === slug
               : true
         );
