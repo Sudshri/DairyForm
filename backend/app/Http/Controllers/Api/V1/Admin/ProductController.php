@@ -6,9 +6,10 @@ use App\Helpers\StorageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
-use App\Models\ProductVariantInventory;
+use App\Models\ProductVariant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -49,13 +50,57 @@ class ProductController extends Controller
             'status'            => ['nullable', 'in:active,inactive,draft'],
             'meta_title'        => ['nullable', 'string', 'max:160'],
             'meta_description'  => ['nullable', 'string', 'max:320'],
+            'image'             => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ]);
+
+        $variantsInput = $request->validate([
+            'variants'                       => ['nullable', 'array'],
+            'variants.*.variant_name'        => ['required_with:variants', 'string', 'max:100'],
+            'variants.*.weight'              => ['required_with:variants', 'numeric', 'min:0'],
+            'variants.*.weight_unit'         => ['required_with:variants', 'in:g,kg,ml,l,piece'],
+            'variants.*.sku'                 => ['required_with:variants', 'string', 'max:100'],
+            'variants.*.mrp_price'           => ['required_with:variants', 'numeric', 'min:0'],
+            'variants.*.selling_price'       => ['required_with:variants', 'numeric', 'min:0'],
+            'variants.*.purchase_price'      => ['nullable', 'numeric', 'min:0'],
+            'variants.*.status'              => ['nullable', 'in:active,inactive'],
+        ])['variants'] ?? [];
 
         $data['slug'] ??= Str::slug($data['product_name']) . '-' . substr(uniqid(), -4);
 
+        if ($request->hasFile('image')) {
+            $data['image'] = StorageHelper::storePublic($request->file('image'), 'products');
+        }
+
         $product = Product::create($data);
 
-        return $this->created($product->load('category:id,name'), 'Product created.');
+        // Save variants
+        foreach ($variantsInput as $i => $v) {
+            $product->variants()->create([
+                'variant_name'   => $v['variant_name'],
+                'weight'         => $v['weight'],
+                'weight_unit'    => $v['weight_unit'],
+                'sku'            => $v['sku'],
+                'mrp_price'      => $v['mrp_price'],
+                'selling_price'  => $v['selling_price'],
+                'purchase_price' => $v['purchase_price'] ?? null,
+                'status'         => $v['status'] ?? 'active',
+                'sort_order'     => $i,
+            ]);
+        }
+
+        // Create a primary ProductImage entry if an image was uploaded
+        if ($product->image) {
+            $relativePath = ltrim(str_replace(rtrim(config('app.url'), '/') . '/storage/', '', $product->image), '/');
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_path' => $relativePath,
+                'alt_text'   => $product->product_name,
+                'sort_order' => 1,
+                'is_primary' => true,
+            ]);
+        }
+
+        return $this->created($product->load(['category:id,name', 'variants', 'images']), 'Product created.');
     }
 
     public function update(Request $request, int $id): JsonResponse
@@ -73,11 +118,73 @@ class ProductController extends Controller
             'status'            => ['nullable', 'in:active,inactive,draft'],
             'meta_title'        => ['nullable', 'string', 'max:160'],
             'meta_description'  => ['nullable', 'string', 'max:320'],
+            'image'             => ['nullable', 'image', 'max:5120', 'mimes:jpg,jpeg,png,webp'],
         ]);
+
+        if ($request->hasFile('image')) {
+            StorageHelper::deleteByUrl($product->getAttribute('image'));
+            $data['image'] = StorageHelper::storePublic($request->file('image'), 'products');
+
+            // Keep primary ProductImage record in sync
+            $primary = ProductImage::where('product_id', $id)->where('is_primary', true)->first();
+            $relativePath = ltrim(str_replace(rtrim(config('app.url'), '/') . '/storage/', '', $data['image']), '/');
+            if ($primary) {
+                Storage::disk('public')->delete($primary->image_path);
+                $primary->update(['image_path' => $relativePath, 'alt_text' => $product->getAttribute('product_name')]);
+            } else {
+                ProductImage::create([
+                    'product_id' => $id,
+                    'image_path' => $relativePath,
+                    'alt_text'   => $product->getAttribute('product_name'),
+                    'sort_order' => 1,
+                    'is_primary' => true,
+                ]);
+            }
+        }
+
+        $variantsInput = $request->validate([
+            'variants'                       => ['nullable', 'array'],
+            'variants.*.id'                  => ['nullable', 'integer', 'exists:product_variants,id'],
+            'variants.*.variant_name'        => ['required_with:variants', 'string', 'max:100'],
+            'variants.*.weight'              => ['required_with:variants', 'numeric', 'min:0'],
+            'variants.*.weight_unit'         => ['required_with:variants', 'in:g,kg,ml,l,piece'],
+            'variants.*.sku'                 => ['required_with:variants', 'string', 'max:100'],
+            'variants.*.mrp_price'           => ['required_with:variants', 'numeric', 'min:0'],
+            'variants.*.selling_price'       => ['required_with:variants', 'numeric', 'min:0'],
+            'variants.*.purchase_price'      => ['nullable', 'numeric', 'min:0'],
+            'variants.*.status'              => ['nullable', 'in:active,inactive'],
+        ])['variants'] ?? [];
 
         $product->update($data);
 
-        return $this->success($product->fresh(['category:id,name', 'variants']), 'Product updated.');
+        if (!empty($variantsInput)) {
+            $submittedIds = array_filter(array_column($variantsInput, 'id'));
+
+            // Delete variants removed by the user
+            $product->variants()->whereNotIn('id', $submittedIds)->delete();
+
+            foreach ($variantsInput as $i => $v) {
+                $fields = [
+                    'variant_name'   => $v['variant_name'],
+                    'weight'         => $v['weight'],
+                    'weight_unit'    => $v['weight_unit'],
+                    'sku'            => $v['sku'],
+                    'mrp_price'      => $v['mrp_price'],
+                    'selling_price'  => $v['selling_price'],
+                    'purchase_price' => $v['purchase_price'] ?? null,
+                    'status'         => $v['status'] ?? 'active',
+                    'sort_order'     => $i,
+                ];
+
+                if (!empty($v['id'])) {
+                    ProductVariant::where('product_id', $id)->where('id', $v['id'])->update($fields);
+                } else {
+                    $product->variants()->create($fields);
+                }
+            }
+        }
+
+        return $this->success($product->fresh(['category:id,name', 'variants', 'images']), 'Product updated.');
     }
 
     public function destroy(int $id): JsonResponse
@@ -128,7 +235,7 @@ class ProductController extends Controller
         $image = ProductImage::where('product_id', $id)->findOrFail($imgId);
 
         // Use StorageHelper so we pass the disk-relative path, not a full URL
-        \Illuminate\Support\Facades\Storage::disk('public')->delete($image->image_path);
+        Storage::disk('public')->delete($image->image_path);
 
         $wasPrimary = $image->is_primary;
         $image->delete();

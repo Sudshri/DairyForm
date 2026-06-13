@@ -39,6 +39,14 @@ Route::prefix('v1')->group(function () {
     // Banners
     Route::get('banners',                        [\App\Http\Controllers\Api\V1\BannerController::class, 'index']);
 
+    // Public offers (active only, no auth required)
+    Route::get('offers',                         [\App\Http\Controllers\Api\V1\OfferController::class, 'index']);
+
+    // Contact, bulk-order & partner enquiries (public, no auth)
+    Route::post('contact',                       [\App\Http\Controllers\Api\V1\ContactController::class,        'send']);
+    Route::post('bulk-order-inquiries',          [\App\Http\Controllers\Api\V1\BulkOrderController::class,      'send']);
+    Route::post('partner-inquiries',             [\App\Http\Controllers\Api\V1\PartnerInquiryController::class, 'send']);
+
     // ── Protected ────────────────────────────────────────────────────────────
     Route::middleware('auth:sanctum')->group(function () {
 

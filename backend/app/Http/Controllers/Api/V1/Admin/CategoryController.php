@@ -22,6 +22,11 @@ class CategoryController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        // Normalize empty string to null so top-level categories (no parent) pass validation
+        if ($request->input('parent_id') === '' || $request->input('parent_id') === '0') {
+            $request->merge(['parent_id' => null]);
+        }
+
         $data = $request->validate([
             'name'         => ['required', 'string', 'max:100'],
             'slug'         => ['nullable', 'string', 'max:120', 'unique:categories,slug'],
@@ -50,6 +55,10 @@ class CategoryController extends Controller
     public function update(Request $request, int $id): JsonResponse
     {
         $category = Category::findOrFail($id);
+
+        if ($request->input('parent_id') === '' || $request->input('parent_id') === '0') {
+            $request->merge(['parent_id' => null]);
+        }
 
         $data = $request->validate([
             'name'         => ['sometimes', 'string', 'max:100'],

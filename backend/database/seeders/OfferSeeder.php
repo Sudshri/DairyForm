@@ -83,26 +83,6 @@ class OfferSeeder extends Seeder
             'per_user_limit'       => 1,
         ]);
 
-        // ── 5. Category offer: 5% OFF on all Butter variants ─────────────────
-        $butterCategory = \App\Models\Category::where('name', 'Butter')->first();
-
-        Offer::create([
-            'offer_name'                => '5% OFF on All Butter',
-            'offer_type'                => 'category',
-            'discount_value'            => 5.00,
-            'applicable_category_id'    => $butterCategory?->id,
-            'start_date'                => now(),
-            'end_date'                  => now()->addMonths(2),
-            'is_active'                 => true,
-            'is_public'                 => true,
-        ]);
-
-        // Assign butter category offer to all butter variants
-        if ($butterCategory) {
-            $butterProducts = $butterCategory->products()->with('variants')->get();
-            $butterProducts->each(function ($product) use ($percent10) {
-                // Re-use percent10 offer or create a dedicated one
-            });
-        }
+      
     }
 }
