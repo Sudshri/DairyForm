@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BannerController extends Controller
 {
@@ -22,6 +23,16 @@ class BannerController extends Controller
                 $request->merge([
                     $field => \filter_var($request->input($field), FILTER_VALIDATE_BOOLEAN),
                 ]);
+            }
+        }
+    }
+
+    /** Convert empty strings to null so nullable validation rules pass */
+    private function nullifyEmpty(Request $request, string ...$fields): void
+    {
+        foreach ($fields as $field) {
+            if ($request->input($field) === '') {
+                $request->merge([$field => null]);
             }
         }
     }
@@ -43,6 +54,7 @@ class BannerController extends Controller
     public function store(Request $request): JsonResponse
     {
         $this->castBoolean($request, 'is_active', 'open_in_new_tab');
+        $this->nullifyEmpty($request, 'link_url', 'link_type', 'link_id', 'cta_text', 'subtitle', 'start_date', 'end_date');
 
         $data = $request->validate([
             'title'           => ['required', 'string', 'max:150'],
@@ -74,9 +86,10 @@ class BannerController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
-        $this->castBoolean($request, 'is_active', 'open_in_new_tab');
-
         $banner = Banner::findOrFail($id);
+
+        $this->castBoolean($request, 'is_active', 'open_in_new_tab');
+        $this->nullifyEmpty($request, 'link_url', 'link_type', 'link_id', 'cta_text', 'subtitle', 'start_date', 'end_date');
 
         $data = $request->validate([
             'title'           => ['sometimes', 'string', 'max:150'],
@@ -88,19 +101,21 @@ class BannerController extends Controller
             'cta_text'        => ['nullable', 'string', 'max:50'],
             'sort_order'      => ['nullable', 'integer'],
             'is_active'       => ['nullable', 'boolean'],
+            'open_in_new_tab' => ['nullable', 'boolean'],
             'start_date'      => ['nullable', 'date'],
             'end_date'        => ['nullable', 'date'],
-            'image'           => ['nullable', 'image', 'max:3072'],
-            'mobile_image'    => ['nullable', 'image', 'max:2048'],
         ]);
 
         if ($request->hasFile('image')) {
-            StorageHelper::deleteByUrl($banner->image); // delete old file
-            $data['image'] = StorageHelper::storePublic($request->file('image'), 'banners');
+            $oldPath = $banner->getRawOriginal('image');
+            if ($oldPath) Storage::disk('public')->delete($oldPath);
+            $data['image'] = $request->file('image')->store('banners', 'public');
         }
+
         if ($request->hasFile('mobile_image')) {
-            StorageHelper::deleteByUrl($banner->mobile_image);
-            $data['mobile_image'] = StorageHelper::storePublic($request->file('mobile_image'), 'banners');
+            $oldPath = $banner->getRawOriginal('mobile_image');
+            if ($oldPath) Storage::disk('public')->delete($oldPath);
+            $data['mobile_image'] = $request->file('mobile_image')->store('banners', 'public');
         }
 
         $banner->update($data);
@@ -110,8 +125,10 @@ class BannerController extends Controller
     public function destroy(int $id): JsonResponse
     {
         $banner = Banner::findOrFail($id);
-        StorageHelper::deleteByUrl($banner->image);
-        StorageHelper::deleteByUrl($banner->mobile_image);
+        Storage::disk('public')->delete(array_filter([
+            $banner->getRawOriginal('image'),
+            $banner->getRawOriginal('mobile_image'),
+        ]));
         $banner->delete();
         return $this->noContent('Banner deleted.');
     }

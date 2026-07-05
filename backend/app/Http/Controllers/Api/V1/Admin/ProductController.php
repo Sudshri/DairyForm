@@ -89,11 +89,10 @@ class ProductController extends Controller
         }
 
         // Create a primary ProductImage entry if an image was uploaded
-        if ($product->image) {
-            $relativePath = ltrim(str_replace(rtrim(config('app.url'), '/') . '/storage/', '', $product->image), '/');
+        if (isset($data['image'])) {
             ProductImage::create([
                 'product_id' => $product->id,
-                'image_path' => $relativePath,
+                'image_path' => $data['image'],
                 'alt_text'   => $product->product_name,
                 'sort_order' => 1,
                 'is_primary' => true,
@@ -122,19 +121,18 @@ class ProductController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            StorageHelper::deleteByUrl($product->getAttribute('image'));
+            Storage::disk('public')->delete($product->getRawOriginal('image'));
             $data['image'] = StorageHelper::storePublic($request->file('image'), 'products');
 
             // Keep primary ProductImage record in sync
             $primary = ProductImage::where('product_id', $id)->where('is_primary', true)->first();
-            $relativePath = ltrim(str_replace(rtrim(config('app.url'), '/') . '/storage/', '', $data['image']), '/');
             if ($primary) {
-                Storage::disk('public')->delete($primary->image_path);
-                $primary->update(['image_path' => $relativePath, 'alt_text' => $product->getAttribute('product_name')]);
+                Storage::disk('public')->delete($primary->getRawOriginal('image_path'));
+                $primary->update(['image_path' => $data['image'], 'alt_text' => $product->getAttribute('product_name')]);
             } else {
                 ProductImage::create([
                     'product_id' => $id,
-                    'image_path' => $relativePath,
+                    'image_path' => $data['image'],
                     'alt_text'   => $product->getAttribute('product_name'),
                     'sort_order' => 1,
                     'is_primary' => true,
@@ -218,9 +216,8 @@ class ProductController extends Controller
                 'is_primary'  => $isPrimary,
             ]);
 
-            // Set primary image on product itself — full URL with APP_URL prefix
             if ($isPrimary) {
-                $product->update(['image' => StorageHelper::fullUrl($path)]);
+                $product->update(['image' => $path]);
             }
 
             $uploaded[] = $image;
@@ -234,8 +231,7 @@ class ProductController extends Controller
     {
         $image = ProductImage::where('product_id', $id)->findOrFail($imgId);
 
-        // Use StorageHelper so we pass the disk-relative path, not a full URL
-        Storage::disk('public')->delete($image->image_path);
+        Storage::disk('public')->delete($image->getRawOriginal('image_path'));
 
         $wasPrimary = $image->is_primary;
         $image->delete();
@@ -244,7 +240,7 @@ class ProductController extends Controller
             $next = ProductImage::where('product_id', $id)->orderBy('sort_order')->first();
             if ($next) {
                 $next->update(['is_primary' => true]);
-                Product::find($id)?->update(['image' => StorageHelper::fullUrl($next->image_path)]);
+                Product::find($id)?->update(['image' => $next->getRawOriginal('image_path')]);
             }
         }
 

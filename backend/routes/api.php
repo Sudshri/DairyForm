@@ -42,6 +42,9 @@ Route::prefix('v1')->group(function () {
     // Public offers (active only, no auth required)
     Route::get('offers',                         [\App\Http\Controllers\Api\V1\OfferController::class, 'index']);
 
+    // Public reviews (approved only, no auth required)
+    Route::get('reviews',                        [\App\Http\Controllers\Api\V1\ReviewController::class, 'publicIndex']);
+
     // Contact, bulk-order & partner enquiries (public, no auth)
     Route::post('contact',                       [\App\Http\Controllers\Api\V1\ContactController::class,        'send']);
     Route::post('bulk-order-inquiries',          [\App\Http\Controllers\Api\V1\BulkOrderController::class,      'send']);

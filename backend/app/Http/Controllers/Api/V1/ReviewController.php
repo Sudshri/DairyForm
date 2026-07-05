@@ -40,6 +40,27 @@ class ReviewController extends Controller
         ]);
     }
 
+    /** GET /reviews — public, approved only (for testimonials section) */
+    public function publicIndex(Request $request): JsonResponse
+    {
+        $reviews = Review::with('user:id,name')
+            ->where('is_approved', true)
+            ->orderByDesc('helpful_count')
+            ->orderByDesc('created_at')
+            ->paginate($request->integer('per_page', 12));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OK',
+            'data'    => $reviews->items(),
+            'meta'    => [
+                'current_page' => $reviews->currentPage(),
+                'last_page'    => $reviews->lastPage(),
+                'total'        => $reviews->total(),
+            ],
+        ]);
+    }
+
     /** POST /reviews — authenticated */
     public function store(Request $request): JsonResponse
     {

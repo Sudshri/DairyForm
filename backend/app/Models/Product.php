@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\StorageHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -48,6 +49,11 @@ class Product extends Model
     public function views(): HasMany
     {
         return $this->hasMany(ProductView::class);
+    }
+
+    public function getImageAttribute($value): ?string
+    {
+        return StorageHelper::fullUrl($value);
     }
 
     // Scope: active products only

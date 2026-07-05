@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\StorageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -13,6 +14,16 @@ class ProductImage extends Model
     ];
 
     protected $casts = ['is_primary' => 'boolean'];
+
+    public function getImagePathAttribute($value): ?string
+    {
+        return StorageHelper::fullUrl($value);
+    }
+
+    public function getThumbnailPathAttribute($value): ?string
+    {
+        return StorageHelper::fullUrl($value);
+    }
 
     public function product(): BelongsTo
     {

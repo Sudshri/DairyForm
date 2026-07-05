@@ -7,48 +7,69 @@ use Illuminate\Support\Facades\Storage;
 class StorageHelper
 {
     /**
-     * Store a file on the public disk and return its full absolute URL.
-     *
-     * Storage::url() only returns a path starting with "/storage/…".
-     * This helper concatenates APP_URL so the frontend receives a complete URL
-     * like: http://localhost:8000/storage/banners/abc.jpg
-     *
-     * @param  \Illuminate\Http\UploadedFile  $file
-     * @param  string  $directory   e.g. 'banners', 'products/5'
-     * @return string  Full public URL
+     * Store a file and return only the relative path (e.g. "products/1/abc.png").
+     * Never store full URLs in the database — use fullUrl() at read time.
      */
     public static function storePublic(\Illuminate\Http\UploadedFile $file, string $directory): string
     {
-        $relativePath = $file->store($directory, 'public');
-        return self::fullUrl($relativePath);
+        return $file->store($directory, 'public');
     }
 
     /**
-     * Convert a storage-relative path to a full absolute URL.
-     * Works for paths returned by UploadedFile::store() or Storage::path().
+     * Convert a stored path to a full URL using the current APP_URL.
+     *
+     * Handles three input formats:
+     *   1. Relative path  → "products/1/abc.png"
+     *   2. Old full URL   → "http://localhost:8000/storage/products/1/abc.png"
+     *   3. Any other host → "https://old-server.com/storage/products/1/abc.png"
+     *
+     * Always returns: "{APP_URL}/storage/{relative-path}"
      */
-    public static function fullUrl(string $relativePath): string
+    public static function fullUrl(?string $path): ?string
     {
-        // Build the URL from APP_URL directly to avoid double-prefixing
-        // that can happen when Storage::disk('public')->url() already returns
-        // a full URL in some Laravel/filesystem configurations.
+        if (empty($path)) return null;
+
+        // Already a URL — strip the host+/storage/ prefix to get relative path
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            // Extract everything after "/storage/"
+            $pos = strpos($path, '/storage/');
+            if ($pos !== false) {
+                $path = substr($path, $pos + \strlen('/storage/'));
+            }
+            // If no /storage/ found, return as-is (external image)
+            else {
+                return $path;
+            }
+        }
+
+        // Strip leading "storage/" if accidentally saved with it
+        $path = ltrim($path, '/');
+        if (str_starts_with($path, 'storage/')) {
+            $path = substr($path, \strlen('storage/'));
+        }
+
         $base = rtrim(config('app.url'), '/');
-        $path = ltrim($relativePath, '/');
         return "{$base}/storage/{$path}";
     }
 
     /**
-     * Delete a file from public storage given its full URL.
-     * Strips APP_URL + '/storage' prefix to get the disk-relative path.
+     * Delete a file from public storage given its full URL or relative path.
      */
-    public static function deleteByUrl(?string $fullUrl): void
+    public static function deleteByUrl(?string $urlOrPath): void
     {
-        if (! $fullUrl) return;
+        if (! $urlOrPath) return;
 
-        $base = rtrim(config('app.url'), '/') . '/storage/';
-        if (str_starts_with($fullUrl, $base)) {
-            $diskPath = substr($fullUrl, \strlen($base));
-            Storage::disk('public')->delete($diskPath);
+        if (str_starts_with($urlOrPath, 'http://') || str_starts_with($urlOrPath, 'https://')) {
+            $pos = strpos($urlOrPath, '/storage/');
+            if ($pos === false) return;
+            $diskPath = substr($urlOrPath, $pos + \strlen('/storage/'));
+        } else {
+            $diskPath = ltrim($urlOrPath, '/');
+            if (str_starts_with($diskPath, 'storage/')) {
+                $diskPath = substr($diskPath, \strlen('storage/'));
+            }
         }
+
+        Storage::disk('public')->delete($diskPath);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\StorageHelper;
 use Illuminate\Database\Eloquent\Model;
 
 class Banner extends Model
@@ -14,9 +15,20 @@ class Banner extends Model
     ];
 
     protected $casts = [
-        'is_active'        => 'boolean',
-        'open_in_new_tab'  => 'boolean',
-        'start_date'       => 'datetime',
-        'end_date'         => 'datetime',
+        'is_active'       => 'boolean',
+        'open_in_new_tab' => 'boolean',
+        'start_date'      => 'datetime',
+        'end_date'        => 'datetime',
     ];
+
+    // Classic getter — runs ONLY on read, never touches writes
+    public function getImageAttribute($value): ?string
+    {
+        return StorageHelper::fullUrl($value);
+    }
+
+    public function getMobileImageAttribute($value): ?string
+    {
+        return StorageHelper::fullUrl($value);
+    }
 }
