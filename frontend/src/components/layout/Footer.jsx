@@ -1,23 +1,27 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin, Send } from 'lucide-react';
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { apiGet } from '@/services/apiClient';
+import API from '@/constants/api';
 import logo from '@/assets/logo.png';
 
-const QUICK_LINKS  = [
-  { to:'/',            label:'Home' },
-  { to:'/products',    label:'Products' },
-  { to:'/categories',  label:'Categories' },
-  { to:'/#about',      label:'About Us' },
-  { to:'/#contact',    label:'Contact Us' },
+const QUICK_LINKS = [
+  { to:'/',         label:'Home' },
+  { to:'/about',    label:'About Us' },
+  { to:'/contact',  label:'Contact Us' },
+  { to:'/products', label:'Products' },
 ];
-const CATEGORIES = [
-  { to:'/categories/milk',   label:'Fresh Milk' },
-  { to:'/categories/ghee',   label:'Pure Ghee' },
-  { to:'/categories/paneer', label:'Fresh Paneer' },
-  { to:'/categories/butter', label:'Butter' },
-  { to:'/categories/curd',   label:'Curd & Dahi' },
-  { to:'/categories/khoya',  label:'Khoya & Mawa' },
+
+const FALLBACK_CATEGORIES = [
+  { slug:'milk',   name:'Fresh Milk'   },
+  { slug:'ghee',   name:'Pure Ghee'    },
+  { slug:'paneer', name:'Fresh Paneer' },
+  { slug:'butter', name:'Butter'       },
+  { slug:'dahi',   name:'Curd & Dahi'  },
+  { slug:'khoya',  name:'Khoya & Mawa' },
 ];
+
 const SOCIALS = [
   { icon: Facebook,  href:'#', label:'Facebook'  },
   { icon: Instagram, href:'#', label:'Instagram' },
@@ -28,6 +32,13 @@ const SOCIALS = [
 export default function Footer() {
   const [email,      setEmail]      = useState('');
   const [subscribed, setSubscribed] = useState(false);
+
+  const { data: categoriesRaw } = useQuery({
+    queryKey: ['categories'],
+    queryFn:  () => apiGet(API.CATEGORIES.LIST).then(r => r.data?.data ?? FALLBACK_CATEGORIES),
+    staleTime: 600_000,
+  });
+  const categories = (categoriesRaw ?? FALLBACK_CATEGORIES).slice(0, 6);
 
   const subscribe = (e) => {
     e.preventDefault();
@@ -59,7 +70,7 @@ export default function Footer() {
             </p>
             <div className="space-y-2 mb-5">
               {[
-                {Icon:Phone,  text:'+91 12345 67890'},
+                {Icon:Phone,  text:'+91 8741930226'},
                 {Icon:Mail,   text:'contact@everfresh.org.in'},
                 {Icon:MapPin, text:'SHYAM DAIRY UDYOG, Prop – Harveer'},
               ].map(({Icon,text})=>(
@@ -103,17 +114,23 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Categories */}
+          {/* Categories — dynamic from API */}
           <div>
             <h4 className="font-semibold mb-4 text-sm uppercase tracking-wide" style={{ color:'var(--d-accent)' }}>Categories</h4>
             <ul className="space-y-2.5">
-              {CATEGORIES.map(({ to, label }) => (
-                <li key={label}>
-                  <Link to={to} style={linkStyle}
-                    onMouseEnter={e => e.currentTarget.style.color='var(--d-accent)'}
-                    onMouseLeave={e => e.currentTarget.style.color='var(--d-text-2)'}>{label}</Link>
-                </li>
-              ))}
+              {categories.map((cat) => {
+                const slug  = cat.slug ?? cat.name?.toLowerCase().replace(/\s+/g, '-') ?? '';
+                const label = cat.name ?? cat.label ?? slug;
+                return (
+                  <li key={slug}>
+                    <Link to={`/categories/${slug}`} style={linkStyle}
+                      onMouseEnter={e => e.currentTarget.style.color='var(--d-accent)'}
+                      onMouseLeave={e => e.currentTarget.style.color='var(--d-text-2)'}>
+                      {label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
@@ -160,7 +177,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-4 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3"
           style={{ borderTop:'1px solid var(--d-border-lt)' }}>
-          <p className="text-xs" style={{ color:'var(--d-muted)' }}>© {new Date().getFullYear()} DairyForm. All rights reserved.</p>
+          <p className="text-xs" style={{ color:'var(--d-muted)' }}>© {new Date().getFullYear()} EverFresh Dairy – SHYAM DAIRY UDYOG. All rights reserved.</p>
           <p className="text-xs" style={{ color:'var(--d-muted)' }}>Made with ❤️ for fresh dairy lovers</p>
         </div>
       </div>

@@ -11,9 +11,9 @@ export default function PublicLayout() {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col showcase-page">
+    <div className="min-h-screen flex flex-col showcase-page" style={{ overflowX: 'hidden' }}>
       <Navbar />
-      <main className="flex-1" style={{ paddingTop: 'var(--navbar-h, 0px)' }}>
+      <main className="flex-1 w-full" style={{ paddingTop: 'var(--navbar-h, 0px)', overflowX: 'hidden' }}>
         <Outlet />
       </main>
       <Footer />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
@@ -19,7 +19,14 @@ export default function BannerForm({ banner, onClose, onSaved }) {
     defaultValues: { banner_type:'slider', link_type:'none', sort_order:0, is_active:true },
   });
 
-  useEffect(() => { if (banner) { reset(banner); if (banner.image) setImages([{ url: banner.image }]); } }, [banner, reset]);
+  const resetRef = useRef(reset);
+  resetRef.current = reset;
+
+  useEffect(() => {
+    if (!banner) return;
+    resetRef.current(banner);
+    setImages(banner.image ? [{ url: banner.image }] : []);
+  }, [banner]);
 
   const linkType = watch('link_type');
 
@@ -30,10 +37,12 @@ export default function BannerForm({ banner, onClose, onSaved }) {
       if (hasNewImage) {
         // Must use multipart/form-data when uploading a file
         const fd = new FormData();
-        Object.entries(data).forEach(([k, v]) => {
+        // Strip image/mobile_image — they come from reset(banner) as URL strings.
+        // We append the actual file below, so including the URL would send both
+        // causing PHP to receive image as an array → saved as ["url",[]] in DB.
+        const { image, mobile_image, ...formFields } = data;
+        Object.entries(formFields).forEach(([k, v]) => {
           if (v == null || v === '') return;
-          // FormData converts true→"true" / false→"false" which PHP rejects.
-          // Send 1 / 0 instead — PHP's FILTER_VALIDATE_BOOLEAN accepts them.
           fd.append(k, typeof v === 'boolean' ? (v ? '1' : '0') : v);
         });
         fd.append('image', images[0].file);
@@ -46,10 +55,15 @@ export default function BannerForm({ banner, onClose, onSaved }) {
         return apiUpload(API.ADMIN.BANNERS.CREATE, fd);
       }
 
-      // No new image — send plain JSON
+      // No new image — send plain JSON, strip file/URL fields that aren't changing
+      const { image, mobile_image, ...rest } = data;
+      // Convert empty strings to null so backend nullable rules pass
+      const clean = Object.fromEntries(
+        Object.entries(rest).map(([k, v]) => [k, v === '' ? null : v])
+      );
       return isEdit
-        ? bannerService.update(banner.id, data)
-        : bannerService.create(data);
+        ? bannerService.update(banner.id, clean)
+        : bannerService.create(clean);
     },
     onSuccess: () => {
       dispatch(setNotification({ type: 'success', message: `Banner ${isEdit ? 'updated' : 'created'}!` }));

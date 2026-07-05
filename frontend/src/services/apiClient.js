@@ -48,8 +48,9 @@ http.interceptors.response.use(
   async (error) => {
     const original = error.config;
 
-    // Only attempt refresh on 401 and only once per request
-    if (error.response?.status === 401 && !original._retry) {
+    // Only attempt refresh on 401 when a token exists and only once per request
+    const hasToken = !!useAuthStore.getState().token;
+    if (error.response?.status === 401 && hasToken && !original._retry) {
 
       // If another refresh is already running, queue this request
       if (isRefreshing) {
@@ -84,8 +85,9 @@ http.interceptors.response.use(
 
       } catch (refreshError) {
         flushQueue(refreshError, null);
+        const { user } = useAuthStore.getState();
         useAuthStore.getState().logout();
-        window.location.href = '/login';
+        window.location.href = user?.role === 'admin' ? '/admin/login' : '/login';
         return Promise.reject(refreshError);
 
       } finally {

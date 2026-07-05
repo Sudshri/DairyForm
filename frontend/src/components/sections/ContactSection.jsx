@@ -5,7 +5,7 @@ import { Phone, Mail, MapPin, Send, CheckCircle, Building2, Receipt, ShieldCheck
 import { apiPost } from '@/services/apiClient';
 
 const INFO = [
-  { icon: Phone,  label:'Call Us',  value:'+91 12345 67890',             href:'tel:+911234567890', bg:'#E0F8FF', color:'#17C0F2' },
+  { icon: Phone,  label:'Call Us',  value:'+91 8741930226',             href:'tel:+918741930226', bg:'#E0F8FF', color:'#17C0F2' },
   { icon: Mail,   label:'Email Us', value:'contact@everfresh.org.in',    href:'mailto:contact@everfresh.org.in', bg:'#EEF7D8', color:'#8BC63E' },
   { icon: MapPin, label:'Visit Us', value:'Palsana, Sikar, Rajasthan',   href:'#', bg:'#FFFBEB', color:'#D97706' },
 ];
@@ -57,16 +57,15 @@ export default function ContactSection() {
 
            
             {/* Map placeholder */}
-            <motion.div className="rounded-2xl overflow-hidden h-40 sm:h-44 flex items-center justify-center relative bg-white"
-              style={{ border:'1.5px solid var(--d-border-lt)', boxShadow:'var(--d-shadow-sm)' }}
-              initial={{ opacity:0 }} whileInView={{ opacity:1 }} viewport={{ once:true }}>
-              <div className="absolute inset-0" style={{ background:'linear-gradient(135deg,#E0F8FF,#EEF7D8)' }} />
-              <div className="text-center relative z-10">
-                <MapPin size={30} className="mx-auto mb-2" style={{ color:'var(--d-accent)' }} />
-                <p className="font-semibold text-sm" style={{ color:'var(--d-text)' }}>SHYAM DAIRY UDYOG</p>
-                <p className="text-xs mt-0.5" style={{ color:'var(--d-muted)' }}>Palsana, Sikar, Rajasthan</p>
-              </div>
-            </motion.div>
+           <iframe
+    title="EverFresh Location"
+    src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3539.4228437110314!2d75.36173067565237!3d27.487222176309395!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjfCsDI5JzE0LjAiTiA3NcKwMjEnNTEuNSJF!5e0!3m2!1sen!2sin!4v1782419945553!5m2!1sen!2sin"
+    className="w-full h-[300px] md:h-[450px] lg:h-[250px]"
+    style={{ border: 0 }}
+    allowFullScreen
+    loading="lazy"
+    referrerPolicy="strict-origin-when-cross-origin"
+  />
           </div>
 
           {/* Right form */}
@@ -91,7 +90,7 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <label className="block text-xs font-medium mb-1.5" style={{ color:'var(--d-text-2)' }}>Mobile</label>
-                    <input className="d-input" placeholder="+91 98765 43210" {...register('mobile')} />
+                    <input className="d-input" placeholder="+91 8741930226" {...register('mobile')} />
                   </div>
                 </div>
                 <div>

@@ -86,7 +86,7 @@ export default function AboutSection() {
           </motion.div>
 
           {/* Right visual */}
-          <motion.div className="relative"
+          <motion.div className="relative mt-6 lg:mt-0 px-6 sm:px-8 lg:px-0"
             initial={{ opacity:0, x:40 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }}
             transition={{ duration:0.6, delay:0.1 }}
           >
@@ -99,13 +99,13 @@ export default function AboutSection() {
               />
             </div>
 
-            <motion.div className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 px-4 py-3 rounded-2xl"
+            <motion.div className="absolute top-2 right-8 sm:right-10 lg:-top-4 lg:-right-4 px-4 py-3 rounded-2xl"
               style={{ background:'#FFFFFF', border:'1px solid var(--d-border-lt)', boxShadow:'var(--d-shadow)' }}
               animate={{ y:[0,-8,0] }} transition={{ duration:3, repeat:Infinity }}>
               <p className="text-xs" style={{ color:'var(--d-muted)' }}>Since</p>
               <p className="font-display text-2xl font-bold" style={{ color:'var(--d-accent)' }}>2010</p>
             </motion.div>
-            <motion.div className="absolute -bottom-3 -left-3 sm:-bottom-4 sm:-left-4 px-4 py-3 rounded-2xl"
+            <motion.div className="absolute bottom-2 left-8 sm:left-10 lg:-bottom-4 lg:-left-4 px-4 py-3 rounded-2xl"
               style={{ background:'#FFFFFF', border:'1px solid var(--d-border-lt)', boxShadow:'var(--d-shadow)' }}
               animate={{ y:[0,-6,0] }} transition={{ duration:3.5, repeat:Infinity, delay:0.8 }}>
               <p className="text-xs" style={{ color:'var(--d-muted)' }}>Farms Partnered</p>

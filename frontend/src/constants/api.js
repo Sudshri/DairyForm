@@ -118,6 +118,11 @@ export const API = {
     LIST:            u('/offers'),
   },
 
+  // ── Reviews (public — approved only) ────────────────────────────────────
+  REVIEWS: {
+    LIST:            u('/reviews'),
+  },
+
   // ── ADMIN ────────────────────────────────────────────────────────────────
   ADMIN: {
     DASHBOARD: {

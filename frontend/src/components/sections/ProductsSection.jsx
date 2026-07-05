@@ -8,7 +8,6 @@ import ProductModal from './ProductModal';
 
 const EMOJI = { Milk:'🥛', Ghee:'🍯', Paneer:'🧀', Butter:'🧈', Dahi:'🥣', Khoya:'🍮', Drinks:'🥤', Cheese:'🧀' };
 
-/* Per-category accent color + badge icon */
 const CAT_META = {
   'Milk':                         { color:'#17C0F2', light:'#E0F8FF', Icon: Droplets },
   'Paneer & Cheese':              { color:'#22C55E', light:'#DCFCE7', Icon: Crown    },
@@ -24,7 +23,6 @@ const CAT_META = {
 };
 const DEFAULT_META = { color:'#17C0F2', light:'#E0F8FF', Icon: Crown };
 
-/* Seeded fake rating so it stays consistent between renders */
 function fakeRating(id) {
   const ratings = [4.8, 4.7, 4.9, 4.6, 4.8, 4.7, 4.5, 4.9, 4.8, 4.6];
   const reviews = [126, 98, 210, 178, 143, 87, 234, 67, 192, 115];
@@ -34,7 +32,7 @@ function fakeRating(id) {
 
 const MOCK_PRODUCTS = [
   { id:1, product_name:'Farm Fresh Full Cream Milk A2', category:{name:'Milk'},  short_description:'Premium A2 milk from Gir cows, rich in natural vitamins.',
-    variants:[{id:1,variant_name:'250ml',selling_price:15,mrp_price:18},{id:2,variant_name:'500ml',selling_price:30,mrp_price:35},{id:3,variant_name:'1 Litre',selling_price:58,mrp_price:65,active_offers:[{offer:{offer_name:'₹7 OFF',offer_type:'fixed',discount_value:7}}]}] },
+    variants:[{id:1,variant_name:'250ml',selling_price:15,mrp_price:18},{id:2,variant_name:'500ml',selling_price:30,mrp_price:35},{id:3,variant_name:'1 Litre',selling_price:58,mrp_price:65}] },
   { id:2, product_name:'Pure Cow Ghee A2',              category:{name:'Ghee'},  short_description:'Handcrafted using bilona method from A2 cow milk.',
     variants:[{id:4,variant_name:'250g',selling_price:350,mrp_price:380},{id:5,variant_name:'500g',selling_price:680,mrp_price:720},{id:6,variant_name:'1kg',selling_price:1300,mrp_price:1400}] },
   { id:3, product_name:'Fresh Soft Paneer',             category:{name:'Paneer'},short_description:'Made fresh each morning from pure whole milk.',
@@ -48,16 +46,16 @@ const MOCK_PRODUCTS = [
 ];
 
 function ProductCard({ product, onView }) {
-  const [hovered,   setHovered]   = useState(false);
-  const [liked,     setLiked]     = useState(false);
-  const [selIdx,    setSelIdx]    = useState(0);
-  const [btnHover,  setBtnHover]  = useState(false);
+  const [hovered,  setHovered]  = useState(false);
+  const [liked,    setLiked]    = useState(false);
+  const [selIdx,   setSelIdx]   = useState(0);
+  const [btnHover, setBtnHover] = useState(false);
 
-  const variants  = product.variants ?? [];
-  const cat       = product.category?.name ?? '';
-  const emoji     = EMOJI[cat] ?? '🥛';
-  const meta      = CAT_META[cat] ?? DEFAULT_META;
-  const { Icon }  = meta;
+  const variants    = product.variants ?? [];
+  const cat         = product.category?.name ?? '';
+  const emoji       = EMOJI[cat] ?? '🥛';
+  const meta        = CAT_META[cat] ?? DEFAULT_META;
+  const { Icon }    = meta;
   const { rating, reviews } = fakeRating(product.id);
 
   const selVariant  = variants[selIdx] ?? variants[0] ?? null;
@@ -67,11 +65,11 @@ function ProductCard({ product, onView }) {
 
   return (
     <motion.div
-      className="bg-white rounded-2xl overflow-hidden cursor-pointer flex flex-col"
+      className="bg-white rounded-2xl overflow-hidden cursor-pointer flex flex-col h-full"
       style={{
         border: '1.5px solid var(--d-border-lt)',
         boxShadow: hovered ? '0 12px 40px rgba(0,0,0,0.12)' : '0 2px 8px rgba(0,0,0,0.06)',
-        transform: hovered ? 'translateY(-5px)' : 'translateY(0)',
+        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
         transition: 'transform 0.22s ease, box-shadow 0.22s ease',
       }}
       onClick={() => onView(product)}
@@ -81,70 +79,74 @@ function ProductCard({ product, onView }) {
       whileInView={{ opacity:1, y:0 }}
       viewport={{ once:true, margin:'-40px' }}
     >
-      {/* ── Image area ─────────────────────────────────────────── */}
-      <div className="relative overflow-hidden" style={{ height:'220px', background:'linear-gradient(135deg,#F8FBFF,#F0FBF4)' }}>
+      {/* Image area */}
+      <div className="relative overflow-hidden shrink-0 flex items-center justify-center" style={{ height:'230px', background:'#FFFFFF' }}>
         {product.image ? (
           <img
             src={product.image}
             alt={product.product_name}
-            className="w-full h-full object-contain"
-            style={{ transform: hovered ? 'scale(1.05)' : 'scale(1)', transition:'transform 0.5s ease' }}
+            style={{
+              width:'72%',
+              height:'210px',
+              objectFit:'contain',
+              objectPosition:'center',
+              transform: hovered ? 'scale(1.06)' : 'scale(1)',
+              transition:'transform 0.45s ease',
+              filter: 'drop-shadow(0 3px 10px rgba(0,0,0,0.13))',
+            }}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-8xl"
+            <span className="text-7xl"
               style={{ transform: hovered ? 'scale(1.05)' : 'scale(1)', transition:'transform 0.5s ease', display:'block' }}>
               {emoji}
             </span>
           </div>
         )}
 
-        {/* Category badge – top left */}
-        <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+        {/* Category badge */}
+        <div className="absolute top-2.5 left-2.5 flex items-center gap-1 px-2.5 py-1 rounded-full"
           style={{ background: meta.color, boxShadow:`0 2px 8px ${meta.color}44` }}>
-          <Icon size={11} color="#fff" />
+          <Icon size={10} color="#fff" />
           <span className="text-2xs font-bold text-white leading-none">{cat}</span>
         </div>
 
-        {/* Heart – top right */}
+        {/* Heart */}
         <button
-          className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all"
+          className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center transition-all"
           style={{ background:'#FFFFFF', border:'1.5px solid #E5EDF5', boxShadow:'0 2px 6px rgba(0,0,0,0.08)' }}
           onClick={(e) => { e.stopPropagation(); setLiked(l => !l); }}>
-          <Heart size={15} style={{ color: liked ? '#EF4444' : '#94A3B8', fill: liked ? '#EF4444' : 'none', transition:'all 0.2s' }} />
+          <Heart size={14} style={{ color: liked ? '#EF4444' : '#94A3B8', fill: liked ? '#EF4444' : 'none', transition:'all 0.2s' }} />
         </button>
       </div>
 
-      {/* ── Content ────────────────────────────────────────────── */}
-      <div className="p-4 flex flex-col flex-1">
+      {/* Content */}
+      <div className="p-3.5 sm:p-4 flex flex-col flex-1">
 
-        {/* Name */}
-        <h3 className="font-display font-bold text-base sm:text-lg leading-snug line-clamp-2 mb-1"
+        <h3 className="font-display font-bold text-sm sm:text-base leading-snug line-clamp-2 mb-1"
           style={{ color:'#1E293B' }}>
           {product.product_name}
         </h3>
 
-        {/* Star rating */}
-        <div className="flex items-center gap-2 mb-2">
-          <Star size={14} style={{ color:'#F59E0B', fill:'#F59E0B' }} />
-          <span className="text-sm font-bold" style={{ color:'#1E293B' }}>{rating}</span>
-          <span className="text-xs" style={{ color:'#94A3B8' }}>({reviews} Reviews)</span>
+        <div className="flex items-center gap-1.5 mb-2">
+          <Star size={12} style={{ color:'#F59E0B', fill:'#F59E0B' }} />
+          <span className="text-xs font-bold" style={{ color:'#1E293B' }}>{rating}</span>
+          <span className="text-2xs" style={{ color:'#94A3B8' }}>({reviews})</span>
         </div>
 
-        {/* Short description */}
-        <p className="text-xs leading-relaxed line-clamp-3 mb-3" style={{ color:'#64748B' }}>
+        <p className="text-xs leading-relaxed line-clamp-1 mb-3" style={{ color:'#64748B' }}>
           {product.short_description}
         </p>
 
-        {/* Variant size pills */}
+        {/* Variant pills */}
         {variants.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-1.5 mb-3">
             {variants.slice(0, 3).map((v, i) => {
               const isSel = i === selIdx;
               return (
                 <button key={v.id}
                   onClick={(e) => { e.stopPropagation(); setSelIdx(i); }}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+                  className="px-2.5 py-1 rounded-full text-2xs font-semibold transition-all"
                   style={{
                     background: isSel ? meta.light : '#FFFFFF',
                     border: `1.5px solid ${isSel ? meta.color : '#E2EAF0'}`,
@@ -157,17 +159,17 @@ function ProductCard({ product, onView }) {
           </div>
         )}
 
-        {/* Price row */}
+        {/* Price */}
         {selVariant && (
-          <div className="flex items-center gap-2 mb-4">
-            <span className="font-display text-2xl font-bold" style={{ color:'#1E293B' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="font-display text-xl font-bold" style={{ color:'#1E293B' }}>
               ₹{selling}
             </span>
             {mrp > selling && (
-              <span className="text-sm line-through" style={{ color:'#94A3B8' }}>₹{mrp}</span>
+              <span className="text-xs line-through" style={{ color:'#94A3B8' }}>₹{mrp}</span>
             )}
             {discountPct > 0 && (
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+              <span className="text-2xs font-bold px-1.5 py-0.5 rounded-full"
                 style={{ background:'#FEF2F2', color:'#EF4444' }}>
                 {discountPct}% OFF
               </span>
@@ -175,25 +177,18 @@ function ProductCard({ product, onView }) {
           </div>
         )}
 
-        {/* View Details CTA */}
+        {/* CTA */}
         <button
           onClick={(e) => { e.stopPropagation(); onView(product); }}
           onMouseEnter={() => setBtnHover(true)}
           onMouseLeave={() => setBtnHover(false)}
+          className="mt-auto w-full rounded-xl text-sm font-semibold transition-all"
           style={{
-            width: '100%',
-            height: '52px',
-            borderRadius: '14px',
+            height: '44px',
             border: btnHover || hovered ? '1.5px solid transparent' : '1.5px solid #17C0F2',
             background: btnHover || hovered ? 'linear-gradient(135deg,#17C0F2,#168AC7)' : '#FFFFFF',
             color: btnHover || hovered ? '#FFFFFF' : '#17C0F2',
-            fontWeight: 600,
-            fontSize: '0.9rem',
-            cursor: 'pointer',
-            transition: 'all 0.22s ease',
             boxShadow: btnHover || hovered ? '0 4px 16px rgba(23,192,242,0.35)' : 'none',
-            letterSpacing: '0.01em',
-            marginTop: 'auto',
           }}
         >
           View Details →
@@ -225,25 +220,25 @@ export default function ProductsSection({ onBulkOrder }) {
     .filter(p => catFilter === 'All' || p.category?.name === catFilter);
 
   return (
-    <section id="products" className="py-16 sm:py-20" style={{ background:'#FFFFFF' }}>
+    <section id="products" className="py-12 sm:py-20" style={{ background:'#FFFFFF' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <motion.div className="text-center mb-10 sm:mb-12"
+        <motion.div className="text-center mb-8 sm:mb-12"
           initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }} viewport={{ once:true }}>
           <span className="d-section-tag">📦 Our Products</span>
-          <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mt-2 mb-3"
+          <h2 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold mt-2 mb-2"
             style={{ color:'var(--d-text)' }}>
             Fresh Dairy <span style={{ color:'var(--d-accent)' }}>Collection</span>
           </h2>
-          <p className="text-base sm:text-lg max-w-xl mx-auto" style={{ color:'var(--d-text-2)' }}>
+          <p className="text-sm sm:text-lg max-w-xl mx-auto" style={{ color:'var(--d-text-2)' }}>
             Click any product to view details and variants.
           </p>
         </motion.div>
 
-        {/* Category filter pills */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        {/* Category filter pills — horizontal scroll on mobile */}
+        <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2 scrollbar-hide sm:flex-wrap">
           {categories.map(cat => (
             <button key={cat} onClick={() => setCat(cat)}
-              className="px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all"
+              className="shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all"
               style={{
                 background: catFilter===cat ? 'var(--d-gradient-accent)' : '#FFFFFF',
                 color:      catFilter===cat ? '#FFFFFF'                  : '#1F2937',
@@ -255,28 +250,50 @@ export default function ProductsSection({ onBulkOrder }) {
           ))}
         </div>
 
-        {/* Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-            {Array.from({length:8}).map((_,i) => (
-              <div key={i} className="rounded-2xl overflow-hidden" style={{ border:'1px solid var(--d-border-lt)' }}>
-                <div className="h-56 animate-pulse" style={{ background:'var(--d-input)' }} />
-                <div className="p-4 space-y-2">
-                  <div className="h-4 rounded-full animate-pulse" style={{ background:'var(--d-input)', width:'75%' }} />
-                  <div className="h-3 rounded-full animate-pulse" style={{ background:'var(--d-input)', width:'50%' }} />
+          <>
+            {/* Mobile skeleton: 2-col */}
+            <div className="grid grid-cols-2 gap-3 sm:hidden">
+              {Array.from({length:4}).map((_,i) => (
+                <div key={i} className="rounded-2xl overflow-hidden" style={{ border:'1px solid var(--d-border-lt)' }}>
+                  <div className="h-40 animate-pulse" style={{ background:'var(--d-input)' }} />
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 rounded-full animate-pulse" style={{ background:'var(--d-input)', width:'75%' }} />
+                    <div className="h-3 rounded-full animate-pulse" style={{ background:'var(--d-input)', width:'50%' }} />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            {/* Desktop skeleton */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+              {Array.from({length:8}).map((_,i) => (
+                <div key={i} className="rounded-2xl overflow-hidden" style={{ border:'1px solid var(--d-border-lt)' }}>
+                  <div className="h-48 animate-pulse" style={{ background:'var(--d-input)' }} />
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 rounded-full animate-pulse" style={{ background:'var(--d-input)', width:'75%' }} />
+                    <div className="h-3 rounded-full animate-pulse" style={{ background:'var(--d-input)', width:'50%' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : products.length === 0 ? (
-          <div className="text-center py-20">
+          <div className="text-center py-16">
             <span className="text-5xl block mb-4">🔍</span>
-            <p style={{ color:'var(--d-muted)' }}>No products found. Try a different search.</p>
+            <p style={{ color:'var(--d-muted)' }}>No products found in this category.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-            {products.map(p => <ProductCard key={p.id} product={p} onView={setModal} />)}
-          </div>
+          <>
+            {/* Mobile: 2-column tight grid */}
+            <div className="grid grid-cols-2 gap-3 sm:hidden">
+              {products.map(p => <ProductCard key={p.id} product={p} onView={setModal} />)}
+            </div>
+
+            {/* Tablet+: responsive grid */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+              {products.map(p => <ProductCard key={p.id} product={p} onView={setModal} />)}
+            </div>
+          </>
         )}
       </div>
 

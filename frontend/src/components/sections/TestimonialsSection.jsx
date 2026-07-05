@@ -20,7 +20,7 @@ export default function TestimonialsSection() {
 
   const { data } = useQuery({
     queryKey: ['testimonials'],
-    queryFn:  () => apiGet(API.ADMIN.REVIEWS.LIST, { is_approved:true, per_page:12 }).then(r => r.data?.data ?? MOCK),
+    queryFn:  () => apiGet(API.REVIEWS.LIST, { is_approved:true, per_page:12 }).then(r => r.data?.data ?? MOCK).catch(() => MOCK),
     staleTime: 300_000,
   });
 

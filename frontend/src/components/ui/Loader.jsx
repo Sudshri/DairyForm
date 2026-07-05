@@ -1,4 +1,5 @@
 import { MilkDrop } from './MilkWave';
+import logo from '@/assets/logo.png';
 
 export function MilkLoader({ message = 'Loading…' }) {
   return (
@@ -36,12 +37,12 @@ export function SkeletonProductCard() {
 
 export function PageLoader() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-milk-soft gap-6">
-      <div className="relative">
-        <div className="w-16 h-16 rounded-full border-4 border-blue-100 border-t-blue-400 animate-spin" />
-        <div className="absolute inset-0 flex items-center justify-center text-2xl">🥛</div>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-5" style={{ background: '#F0F9FF' }}>
+      <div className="relative flex items-center justify-center">
+        <div className="w-24 h-24 rounded-full border-4 border-sky-100 border-t-[#17C0F2] animate-spin absolute" />
+        <img src={logo} alt="EverFresh" className="w-16 h-16 object-contain" />
       </div>
-      <p className="text-slate-400 font-accent">Loading DairyForm…</p>
+      <p className="text-sm font-semibold tracking-wide" style={{ color: '#17C0F2' }}>EverFresh Dairy</p>
     </div>
   );
 }

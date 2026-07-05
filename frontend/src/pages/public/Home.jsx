@@ -58,9 +58,9 @@ export default function Home() {
       </Suspense>
 
       {/* ── 3. OFFER SECTION ───────────────────────────────────────── */}
-      <Suspense fallback={<SectionLoader />}>
+      {/* <Suspense fallback={<SectionLoader />}>
         <OfferSection onBulkOrder={openBulk} />
-      </Suspense>
+      </Suspense> */}
 
       {/* ── 4. PRODUCTS SECTION ────────────────────────────────────── */}
       <Suspense fallback={<SectionLoader />}>

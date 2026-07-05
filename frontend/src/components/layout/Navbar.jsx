@@ -89,7 +89,7 @@ export default function Navbar() {
                 <img
                   src={logo}
                   alt="EverFresh"
-                  className="h-[72px] w-auto object-contain"
+                  className="h-12 sm:h-[72px] w-auto object-contain"
                   style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.12))' }}
                 />
               </NavLink>
@@ -115,8 +115,9 @@ export default function Navbar() {
                 </div>
               </div>
 
-              {/* Right — CTA buttons (desktop) + Hamburger (mobile) */}
-              <div className="flex items-center gap-2.5 shrink-0">
+              {/* Right — CTA buttons (desktop) + mobile compact buttons + Hamburger */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Desktop CTA */}
                 <div className="hidden md:flex items-center gap-2.5">
                   <button
                     onClick={() => setBulkOpen(true)}
@@ -135,11 +136,32 @@ export default function Navbar() {
                     Become A Partner
                   </button>
                 </div>
+
+                {/* Mobile compact icon buttons — always visible */}
+                <div className="flex md:hidden items-center gap-1.5">
+                  <button
+                    onClick={() => setBulkOpen(true)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-white text-2xs font-semibold"
+                    style={{ background: '#17C0F2' }}
+                  >
+                    <ShoppingCart size={12} />
+                    Bulk
+                  </button>
+                  <button
+                    onClick={() => setPartnerOpen(true)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-full text-white text-2xs font-semibold"
+                    style={{ background: '#8BC63E' }}
+                  >
+                    <UserPlus size={12} />
+                    Partner
+                  </button>
+                </div>
+
                 <button
                   onClick={() => setMobileOpen(!mobileOpen)}
-                  className="md:hidden w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-800"
+                  className="md:hidden w-8 h-8 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-800 shrink-0"
                 >
-                  {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+                  {mobileOpen ? <X size={16} /> : <Menu size={16} />}
                 </button>
               </div>
             </div>

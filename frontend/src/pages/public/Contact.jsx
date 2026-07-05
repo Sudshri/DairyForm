@@ -11,8 +11,8 @@ const CONTACT_INFO = [
   {
     icon: Phone,
     label: 'Call Us',
-    value: '+91 98765 43210',
-    href: 'tel:+919876543210',
+    value: '+91 8741930226',
+    href: 'tel:+918741930226',
     bg: '#E0F8FF',
     color: '#17C0F2',
   },
